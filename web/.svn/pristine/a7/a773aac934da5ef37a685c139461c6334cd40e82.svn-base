@@ -1,0 +1,31 @@
+<?php
+
+$message = null;
+if (isset($view_model['api_user'])) {
+    /** @var iWitness_User $user */
+    $user = $view_model['api_user'];
+    if (!$user->isAdmin()) {
+        if ($user->isFree()) {
+            $message = "Your are using free subscription, it's never expire. Would you like to change it?";
+        } elseif ($user->hasExpired()) {
+            $message = "Your subscription was expired on "
+                . iwitness_view_helper_format_date($user->subscriptionExpireAt) . ', please renew it';
+        } else {
+            $message = "Your subscription will be expire at "
+                . iwitness_view_helper_format_date($user->subscriptionExpireAt);
+        }
+    }
+}
+
+if ($message): ?>
+
+    <div class="alert alert-danger alert-dismissible" role="alert">
+        <button type="button" class="close" data-dismiss="alert">
+            <span aria-hidden="true">&times;</span>
+            <span class="sr-only">Close</span>
+        </button>
+        <strong><?php echo $message ?></strong>
+    </div>
+
+<?php endif; ?>
+

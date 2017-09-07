@@ -1,0 +1,279 @@
+<?php
+/**
+ * Plugin Name: iwitness
+ * Plugin URI: http://wordpress.org/plugins/iwitness
+ * Description: This is iwitness plugin
+ * Author: iwitness
+ * Version: 1.0
+ * Author URI: iwitness.com
+ *
+ * @package iwitness
+ * @category Core
+ * @author iwitness
+ */
+
+if (!defined('ABSPATH')) exit; // Exit if accessed directly
+if (!class_exists('iWitness')) :
+
+    final class iWitness
+    {
+        const DEFAULT_API_SERVER_URL = 'http://api.public.dev-vn.webonyx.local';
+        const DEFAULT_NUM_CONTACT_ON_PAGE = 6; // set default is 6
+        const DEFAULT_TIMEZONE = 'America/Los_Angeles';
+        const USER_META_IDENTITY = 'iwitness-identity-key';
+        const USER_META_TOKEN = 'iwitness-token-key';
+        const USER_META_PHOTO_URI = 'iwitness-photo-url';
+
+        /**
+         * @var The single instance of the class
+         */
+        protected static $_instance = null;
+
+
+        /**
+         * @var WP_Session session
+         */
+        public $session = null;
+
+
+        /**
+         * Main iWitness Instance
+         *
+         * @static
+         * @see iWitness()
+         * @return iWitness - Main instance
+         */
+        public static function instance()
+        {
+            if (is_null(self::$_instance)) {
+                self::$_instance = new self();
+            }
+            return self::$_instance;
+        }
+
+        /**
+         * iWitness Constructor.
+         * @access public
+         * @return iWitness
+         */
+        public function __construct()
+        {
+            // Define constants
+            $this->define_contants();
+
+            // Include required files
+            $this->includes();
+
+            // Hooks
+            add_action('init', array($this, 'init'), 0);
+            add_action('init', array($this, 'include_template_functions'));
+            add_action('init', array('iWitness_Shortcodes', 'init'));
+            // add_action('after_setup_theme', array($this, 'setup_environment'));
+
+            // Loaded action
+            do_action('iwitness_loaded');
+
+            include_once($this->plugin_path() . '/includes/iwitness-login-functions.php');
+        }
+
+        /**
+         * Init WooCommerce when WordPress Initialises.
+         */
+        public function init()
+        {
+            $this->session = WP_Session::get_instance();
+
+            add_filter('wp_session_expiration', function () {
+                return 60 * 60;
+            }); // Set expiration to 1 hour
+            add_filter('authenticate', 'iwitness_authenticate_username_password', 20, 3);
+
+            add_filter('http_request_timeout', 'custom_request_timeout');
+
+            add_action('template_redirect', 'iwitness_redirect_to_error_if_api_not_available', 1);
+            add_action('template_redirect', 'iwitness_redirect_to_login_if_not_logged_in', 2);
+            add_action('template_redirect', 'iwitness_restrict_pages_if_subscription_expired', 3);
+
+
+            // AJAX callback handler
+            include_once('includes/iwitness-ajax-handler-functions.php');
+        }
+
+        /**
+         * Define iWitness Constants
+         */
+        private function define_contants()
+        {
+            if (!defined('IWITNESS_PLUGIN_FILE')) {
+                define('IWITNESS_PLUGIN_FILE', __FILE__);
+            }
+            if (!defined('IWITNESS_VERSION')) {
+                define('IWITNESS_VERSION', '1.0');
+            }
+
+            if (!defined('IWITNESS_TEMPLATE_PATH')) {
+                define('IWITNESS_TEMPLATE_PATH', $this->template_path());
+            }
+
+            include_once('includes/page-constants.php');
+        }
+
+        private function includes()
+        {
+            include_once('includes/iwitness-core-functions.php');
+            include_once('includes/class-iwitness-assets.php');
+            include_once('includes/iwitness-log-functions.php');
+
+            //view helper
+            include_once('includes/iwitness-view-helper-functions.php');
+
+            //load notice
+            if (!class_exists('WP_Session')) {
+                require_once(WP_PLUGIN_DIR . '/wp-session-manager/wp-session-manager.php');
+            }
+
+            include_once('includes/iwitness-notice-functions.php');
+
+
+            // front-end includes
+            include_once('includes/class-iwitness-form-handler.php');
+            include_once('includes/class-iwitness-shortcodes.php');
+
+        }
+
+        /**
+         * Function used to Init iWitness Template Functions
+         */
+        public function include_template_functions()
+        {
+            include_once('includes/iwitness-template-functions.php');
+        }
+
+        /**
+         * Get the plugin url.
+         *
+         * @return string
+         */
+        public function plugin_url()
+        {
+            return untrailingslashit(plugins_url('/', __FILE__));
+        }
+
+        /**
+         * Get the plugin path.
+         *
+         * @return string
+         */
+        public function plugin_path()
+        {
+            return untrailingslashit(plugin_dir_path(__FILE__));
+        }
+
+        /**
+         * Get the template path.
+         *
+         * @return string
+         */
+        public function template_path()
+        {
+            return apply_filters('IWITNESS_TEMPLATE_PATH', 'iwitness/');
+        }
+
+        /**
+         * Get Ajax URL.
+         *
+         * @return string
+         */
+        public function ajax_url()
+        {
+            return admin_url('admin-ajax.php', 'relative');
+        }
+
+        /**
+         * @param null $path
+         * @throws Exception
+         * @return string
+         */
+        public function api_uri($path = null)
+        {
+            if(get_option(IWITNESS_API_URL_OPTION)  !== true || get_option(IWITNESS_API_URL_OPTION) === '') {
+                add_option(IWITNESS_API_URL_OPTION, self::DEFAULT_API_SERVER_URL, null, 'no');
+                // throw new \Exception('Settings for API Server URL was not found, please go to Admin Dashboard > Settings > iWitness Settings to config it');
+            }
+
+            return $path ? get_option(IWITNESS_API_URL_OPTION) . $path : get_option(IWITNESS_API_URL_OPTION);
+        }
+
+        /**
+         * @return string
+         */
+        public function user_meta_api_identity()
+        {
+            return self::USER_META_IDENTITY;
+        }
+
+        /**
+         * @return string
+         */
+        public function user_meta_photo_url()
+        {
+            return self::USER_META_PHOTO_URI;
+        }
+
+        /**
+         * @return string
+         */
+        public function user_meta_api_token()
+        {
+            return self::USER_META_TOKEN;
+        }
+
+        /**
+         * Get a session variable
+         *
+         * @param string $key
+         * @param  mixed $default used if the session variable isn't set
+         * @return mixed value of session variable
+         */
+        public function  session_get($key, $default = null)
+        {
+            return isset($this->session[$key]) ? ($this->session[$key]) : $default;
+        }
+
+        /**
+         * @return WP_Session
+         */
+        public function session()
+        {
+            return $this->session;
+        }
+
+        /**
+         * Get number of contacts in db if not we will input default value for it
+         *
+         * @return mixed|void
+         */
+        public function get_num_of_contact_config()
+        {
+            if(get_option(IWITNESS_NUM_CONTACT_ON_PAGE_OPTION)  !== true || get_option(IWITNESS_NUM_CONTACT_ON_PAGE_OPTION) === '') {
+                add_option(IWITNESS_NUM_CONTACT_ON_PAGE_OPTION, self::DEFAULT_NUM_CONTACT_ON_PAGE, null, 'no');
+            }
+
+            return get_option(IWITNESS_NUM_CONTACT_ON_PAGE_OPTION);
+        }
+    }
+
+endif;
+
+/**
+ * Returns the main instance of perpcast to prevent the need to use globals.
+ *
+ * @return iWitness
+ */
+function iWitness()
+{
+    return iWitness::instance();
+}
+
+// Global for backwards compatibility.
+$GLOBALS['iwitness'] = iWitness();

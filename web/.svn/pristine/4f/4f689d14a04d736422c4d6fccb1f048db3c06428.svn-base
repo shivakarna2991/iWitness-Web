@@ -1,0 +1,60 @@
+<?php
+/**
+ * Handler all POST actions in the client side
+ *
+ * @author      iWitness
+ * @category    FormHandler
+ * @package     iWitness/FormHandler
+ * @version     1.0
+ */
+
+if (!defined('ABSPATH')) {
+    exit;
+} // Exit if accessed directly
+if (!class_exists('iWitness_Contact_Form_Handler')) :
+
+    class iWitness_Contact_Form_Handler
+    {
+        /**
+         * Constructor
+         */
+        public function __construct()
+        {
+            add_action('init', array($this, 'do_delete_contact'));
+        }
+
+        /**
+         * Delete contact handler
+         */
+        public function do_delete_contact()
+        {
+            if (!iwitness_validate_submit('iwitness_do_delete_contact')) {
+                return;
+            }
+
+            $errors = array();
+
+            // get value from the form
+            $id = iwitness_get_post_field_value('id', true, null);
+            // validate them
+            if (empty($id)) {
+                $errors['id'][] = "Cannot delete contact $id";
+            }
+
+            if (count($errors) > 0) {
+                $result = array('status' => 422, 'message' => 'Validation failed', 'response' => $errors);
+            } else {
+                try {
+
+                    $result = iwitness_api_delete('/contact/' . $id);
+                    wp_redirect(iwitness_get_page_path(IWITNESS_PAGE_CONTACT_LIST_ID));
+                    exit;
+
+                } catch (\Exception $ex) {
+                    iwitness_handle_submit_exception($ex);
+                }
+            }
+        }
+    }
+endif;
+new  iWitness_Contact_Form_Handler();

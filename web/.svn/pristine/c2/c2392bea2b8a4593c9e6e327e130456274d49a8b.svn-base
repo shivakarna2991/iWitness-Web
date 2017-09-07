@@ -1,0 +1,33 @@
+<?php do_action('iwitness_print_notices'); ?>
+
+<?php $isSuccess = (isset($_POST['forgot-password']) && $_POST['forgot-password'] == true); ?>
+
+<h2>Forgot Password</h2>
+<hr>
+
+<?php if (!$isSuccess): ?>
+
+    <div class="col-md-6">
+
+        <form data-validate="true" method="post"
+              action="<?php echo iwitness_get_page_path(IWITNESS_PAGE_FORGOT_PASSWORD_ID); ?>"
+              enctype="application/x-www-form-urlencoded" novalidate="novalidate" role="form">
+            <fieldset>
+
+                <div class="form-group">
+                    <label for="email" class="control-label">Enter your email address:</label>
+                    <input type="email" value="<?= $view_model['email'] ?>" class="form-control" id="email" name="email" data-rule-required="true">
+                </div>
+
+                <p>We will send you instructions on how to restore your password</p>
+
+                <button type="submit" class="btn btn-primary" id="submit" name="action" value="do_forgot_password">
+                    SUBMIT
+                </button>
+            </fieldset>
+        </form>
+
+    </div>
+<?php else : ?>
+    <h4>Instructions sent. Please check your inbox</h4>
+<?php endif; ?>

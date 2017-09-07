@@ -1,0 +1,80 @@
+;
+(function ($) {
+    "use strict";
+
+    $().ready(function () {
+        var $codeForm = $('#code-form')
+            , $startDateControl = $('#datepicker_start_date')
+            , $endDateControl = $('#datepicker_end_date')
+            , $numberOfCodeContainer = $('#number-of-code-container')
+            , $plan = $("#plan")
+            , $subscriptionLength = $("#subscription_length")
+            , $price = $("#price");
+
+        $startDateControl.datepicker({
+            changeMonth: true,
+            changeYear: true,
+            onSelect: function (selected) {
+                $endDateControl.datepicker("option", "minDate", selected)
+            }
+
+        });
+
+        $endDateControl.datepicker({
+            changeMonth: true,
+            changeYear: true,
+            onSelect: function (selected) {
+                $startDateControl.datepicker("option", "maxDate", selected)
+            }
+        });
+
+        $numberOfCodeContainer.hide();
+        $("input[id='single_code']", $codeForm).change(function () {
+            $numberOfCodeContainer.hide();
+        });
+
+        $("input[id='auto_generated']", $codeForm).change(function () {
+            $numberOfCodeContainer.show();
+        });
+
+        $plan.trigger("change");
+
+        $plan.change(function () {
+            var plan = $plan.val();
+            switch (plan) {
+                case "safekidyear":
+                    $subscriptionLength.val($plan.data('safekidyear-length'));
+                    $price.val($plan.data('safekidyear-price'));
+                    $subscriptionLength.prop('disabled', true);
+                    $price.prop('disabled', true);
+
+                    break;
+                case "seattleyear":
+                    $subscriptionLength.val($plan.data('seattleyear-length'));
+                    $price.val($plan.data('seattleyear-price'));
+                    $subscriptionLength.prop('disabled', true);
+                    $price.prop('disabled', true);
+                    break;
+                case "wspta":
+                    $subscriptionLength.val($plan.data('wsptayear-length'));
+                    $price.val($plan.data('wsptayear-price'));
+                    $subscriptionLength.prop('disabled', true);
+                    $price.prop('disabled', true);
+                    break;
+                case "free":
+                    $subscriptionLength.val('');
+                    $subscriptionLength.prop('disabled', true);
+                    $price.val($plan.data(''));
+                    $price.prop('disabled', true);
+                    break;
+                case "":
+                default :
+                    $subscriptionLength.prop('disabled', false);
+                    $price.prop('disabled', false);
+                    break
+            }
+
+        });
+    });
+
+})(jQuery);

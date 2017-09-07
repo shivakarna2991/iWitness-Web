@@ -1,0 +1,83 @@
+<?php do_action('iwitness_print_notices'); ?>
+
+<h2>Subscription Report</h2>
+<hr>
+
+<div id="subscription-table-container">
+
+    <div id="columnSelector" class="columnSelector hide">
+        <!-- this div is where the column selector is added -->
+    </div>
+
+    <div class="table-responsive">
+        <div style="margin: 15px;">
+            <form class="form" method="GET" action="#" data-validate="true" role="form">
+
+                <label class="col-md-1 control-label" for="start-date">Start Date: </label>
+
+                <div class="col-md-2">
+                    <input type="text" class="form-control required" id="start-date" name="start-date"
+                           readonly="readonly"/>
+                </div>
+                <label class="col-md-1 control-label" for="end-date">End Date: </label>
+
+                <div class="col-md-2">
+                    <input type="text" class="form-control required" id="end-date" name="end-date"
+                           readonly="readonly"/>
+                </div>
+                <button id="search" class="btn btn-primary">Search</button>
+                <!--<button id="popover" type="button" class="btn btn-primary pull-right"
+                        style="margin-right: 15px;">
+                    Columns
+                </button>-->
+
+            </form>
+
+        </div>
+        <table class="table tablesorter">
+            <thead>
+            <tr>
+                <th class="columnSelector-disable text-center">No.</th>
+                <th class="columnSelector-disable">First Name</th>
+                <th class="columnSelector-disable">Last Name</th>
+                <th class="columnSelector-disable">Phone</th>
+                <th class="columnSelector-disable">Email</th>
+                <th class="columnSelector-disable">Subscription Start</th>
+                <th class="columnSelector-disable">Subscription End</th>
+            </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
+
+        <div id="no-record" class="alert alert-info hide" role="alert">
+            <div class="text-center">
+                <strong>No record have been found !!!</strong>
+            </div>
+        </div>
+    </div>
+
+    <!-- user template -->
+    <script type="text/html" id="table-row-template">
+        <td data-content="index" class="text-center"></td>
+        <td data-content="firstName"></td>
+        <td data-content="lastName"></td>
+        <td data-content="phone"></td>
+        <td data-content="email"></td>
+        <td data-content="subscriptionStartAt"></td>
+        <td data-content="subscriptionExpireAt"></td>
+    </script>
+</div>
+
+<?php
+// lazy loading style and script
+wp_print_styles('jquery-ui-css');
+wp_print_scripts('jquery-ui');
+wp_print_scripts('jquery-template-script-plugin');
+wp_print_scripts('jquery-table-sorter-script-plugin');
+wp_print_scripts('jquery-table-sorter-pager-script-plugin');
+wp_print_scripts('jquery-table-sorter-widget-script-plugin');
+wp_print_scripts('jquery-table-sorter-col-selector-widget-script-plugin');
+wp_print_scripts('iwitness-subscription-report-plugin');
+?>

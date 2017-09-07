@@ -1,0 +1,12 @@
+/* New custom css here */
+#profile {
+
+  #profile-photo {
+    background-color: $yellow;
+    border: 1px solid #bdbebf;
+    border-radius: 12px;
+    box-shadow: 3px 3px 3px #333;
+    margin-bottom: 10px;
+  }
+
+}

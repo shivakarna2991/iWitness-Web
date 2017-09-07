@@ -1,0 +1,115 @@
+;
+(function ($) {
+    "use strict";
+
+    $().ready(function () {
+        UserReport.init();
+    });
+
+    var UserReport = (function () {
+
+        var $userTableContainer = $('#user-table-container'),
+            $userTable = $userTableContainer.find('table'),
+            $startDate = $('#start-date'),
+            $endDate = $('#end-date'),
+            $search = $('#search');
+
+        function init() {
+            // binding date pickers
+            bindDatePickers();
+
+            // binding user table
+            $userTableContainer.iwBindingTable();
+
+            // binding search event
+            bindSearch();
+        }
+
+        function bindDatePickers() {
+            $startDate.datepicker({
+                changeMonth: true,
+                changeYear: true,
+                onSelect: function (selected) {
+                    $endDate.datepicker("option", "minDate", selected)
+                }
+            });
+
+            $endDate.datepicker({
+                changeMonth: true,
+                changeYear: true,
+                onSelect: function (selected) {
+                    $startDate.datepicker("option", "maxDate", selected)
+                }
+            });
+        }
+
+        function bindSearch() {
+            $search.on('click', function (e) {
+                e.preventDefault();
+
+                if ($startDate.val() != '' && $endDate.val() != '') {
+                    getRemoteData({
+                        'startDate': $startDate.val(),
+                        'endDate': $endDate.val()
+                    });
+                } else {
+                    getRemoteData();
+                }
+            });
+        }
+
+        function getRemoteData($params) {
+            $(this)
+                .iwGetRemoteData(buildSearchQuery($params))
+                .done(function (data) {
+
+                    $userTable.find("tbody").find('tr').remove(); // remove old data first
+                    if (data._embedded && data._embedded.user.length > 0) {
+                        var body = buildTableBody(data._embedded.user);
+
+                        $('#no-record').addClass('hide');
+                        $userTable.find("tbody").append($(body).find('tr'));
+                    } else {
+                        $('#no-record').removeClass('hide');
+                    }
+
+                    $userTable.trigger("update");
+                });
+        }
+
+        function buildSearchQuery(params) {
+            var query = '/user';
+            if (params != undefined) {
+                if (params.startDate != undefined && params.endDate != undefined) {
+                    query += '?created_search=';
+                    query += new Date(params.startDate).getTime() / 1000;
+                    query += ',' + new Date(params.endDate).getTime() / 1000;
+                }
+            }
+
+            return query;
+        }
+
+        function buildTableBody(data) {
+            var $trowTemplate = $('#table-row-template', $userTableContainer),
+                $trow = $('<tbody/>');
+
+            $.each(data, function (index, item) {
+                $.extend(true, item, {'index': index + 1}); // extend one more column for index
+                if (item.birthDate) {
+                    item.birthDate = new Date(item.birthDate * 1000).mmddyyyy();
+                }
+
+                var $row = $('<tr/>').loadTemplate($trowTemplate, item);
+                $trow.append($row);
+            });
+
+            return $trow;
+        }
+
+        return {
+            init: init
+        };
+    })();
+
+})(jQuery);

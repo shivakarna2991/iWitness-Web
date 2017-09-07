@@ -1,0 +1,17 @@
+/* Our customization */
+#tell-a-friend-form {
+  .email-box {
+    clear: both;
+    margin: 0;
+    padding: 1px 0;
+
+    h5 {
+      margin-left: 15px;
+      font-weight:bolder;
+    }
+
+    input {
+      margin: 2px;
+    }
+  }
+}

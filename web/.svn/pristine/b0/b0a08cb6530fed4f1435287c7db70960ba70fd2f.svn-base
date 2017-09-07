@@ -1,0 +1,52 @@
+;
+(function ($) {
+    "use strict";
+
+    // extend jQuery Validation rule
+    if ($.validator) {
+
+        $.validator.addMethod(
+            'wireless-phone',
+            function (value, field) {
+                // Phone number format is:
+                // DDD-DDD-DDDD for US-based phones and
+                // CODE-DDD-DDD-DDDD for other countries
+                // Note that maximum phone number length is 15 digits
+                //
+                // Phone number validation must be forgiving
+                // For example, if I enter my number all numeric:
+                // 2222333444
+                // It should be converted to the required format vs. throwing an error:
+                // 222-233-3444
+                var d = value.replace(/[^0-9]/g, '');
+                var isValid = (10 <= d.length && d.length <= 15);
+                var isNormalized = /^([0-9]+\-)?[0-9]{3}\-[0-9]{3}\-[0-9]{4}$/.test(value);
+
+                if (isNormalized && d.length === 11 && '1' === d[0]) {
+                    isNormalized = false; // +1- code for US-based phones is not allowed
+                }
+                if (isValid && !isNormalized) {
+                    var norm = d.substr(-10, 3) + '-' + d.substr(-7, 3) + '-' + d.substr(-4, 4);
+                    if (d.length > 11 || (d.length === 11 && '1' !== d[0])) {
+                        norm = '+' + d.substr(0, d.length - 10) + '-' + norm;
+                    }
+                    $(field).val(norm);
+                }
+                return isValid;
+            },
+            'Please input valid phone number'
+        );
+
+        $.validator.addMethod('positive-number',
+            function (value) {
+                return Number(value) > 0;
+            }, 'Enter a positive number.'
+        );
+
+        $.validator.addMethod('standard-password-format', function(value) {
+                return /^.*(?=.{8,})(?=..*[0-9])(?=.*[a-z])(?=.*[A-Z]).*$/.test(value);
+            }, 'Invalid password format. A valid password must be at least 8 characters, must contain at least one upper case, one lower case, and one number.'
+        );
+
+    }
+})(jQuery);

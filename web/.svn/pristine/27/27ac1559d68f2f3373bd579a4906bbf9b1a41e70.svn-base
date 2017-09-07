@@ -1,0 +1,176 @@
+<?php
+/**
+ * Loading all needed files for iWitness theme
+ */
+
+if (!defined('IWITNESS_API_URL_OPTION')) {
+    define('IWITNESS_API_URL_OPTION', 'iwitness_api_site_url');
+}
+
+if (!defined('IWITNESS_NUM_CONTACT_ON_PAGE_OPTION')) {
+    define('IWITNESS_NUM_CONTACT_ON_PAGE_OPTION', 'iwitness_num_contact_on_page');
+}
+
+/**
+ * Reference: http://www.paulund.co.uk/create-your-own-wordpress-login-page
+ */
+add_action('wp_login_failed', 'iwitness_login_failed'); // hook failed login
+function iwitness_login_failed($user)
+{
+    // check what page the login attempt is coming from
+    $referrer = $_SERVER['HTTP_REFERER'];
+
+    // check that were not on the default login page
+    if (!empty($referrer) && !strstr($referrer, 'wp-login') && !strstr($referrer, 'wp-admin') && $user != null) {
+        // make sure we don't already have a failed login attempt
+        if (!strstr($referrer, 'login=failed')) {
+            // Redirect to the login page and append a querystring of login failed
+            wp_redirect(add_query_arg('login', 'failed', $referrer));
+        } else {
+            wp_redirect($referrer);
+        }
+
+        exit;
+    }
+}
+
+/**
+ *  Login Url filter: we hook this because we need to customize entire login page
+ */
+add_filter('login_url', 'iwitness_login_url', 10, 3);
+function iwitness_login_url($login_url, $redirect)
+{
+    $login_url = get_bloginfo('wpurl') . '/login';
+
+    if (!empty($redirect)) {
+        $login_url = add_query_arg('redirect_to', urlencode($redirect), $login_url);
+    }
+    return $login_url;
+}
+
+/**
+ * Override the logout to redirect it to home page
+ */
+add_action('wp_logout', 'iwitness_logout_page');
+function iwitness_logout_page()
+{
+    $home_page = home_url();
+    $login_page = add_query_arg('login', 'false', $home_page);
+    wp_redirect($login_page);
+    exit;
+}
+
+/**
+ * Override login redirect for redirect with our purpose
+ */
+add_filter('login_redirect', 'iwitness_login_redirect', 10, 3);
+function iwitness_login_redirect($redirect_to, $requested_redirect_to, $user)
+{
+    if (isset($user->ID) && is_super_admin($user->ID)) {
+        return admin_url();
+    }
+
+    if (iwitness_is_api_admin_user()) {
+        return iwitness_get_page_path(IWITNESS_PAGE_ADMIN_DASHBOARD_ID);
+    }
+
+    if (wp_get_current_user()) {
+        return iwitness_get_page_path(IWITNESS_PAGE_USER_PROFILE_EDIT_ID);
+    }
+
+    return $redirect_to;
+}
+
+/**
+ * Override the login flow of wordpress, when they trying to enter wp-login, then we will redirect them to our login page
+ */
+add_action('init', 'iwitness_redirect_login_page');
+function iwitness_redirect_login_page()
+{
+    // remember log name for next input from user
+    if (isset($_POST['log'])) {
+        $session = iWitness()->session();
+        $session['iwitness_log_key'] = $_POST['log'];
+    }
+
+    $page_viewed = basename($_SERVER['REQUEST_URI']);
+    if ((strstr($page_viewed, "wp-login")
+            && !strstr($page_viewed, "action=logout"))
+        && $_SERVER['REQUEST_METHOD'] == 'GET'
+    ) {
+        wp_redirect(iwitness_get_page_path(IWITNESS_PAGE_USER_LOGIN_ID));
+        exit();
+    }
+}
+
+/**
+ * Include assets for iwitness theme
+ */
+require(get_template_directory() . '/includes/iwitness-assets.php');
+
+/**
+ * Remove the padding at the top of page
+ */
+add_theme_support('admin-bar', array('callback' => '__return_false'));
+
+/**
+ * Add the theme style to the page editor
+ */
+function iwitness_add_editor_styles()
+{
+    add_editor_style(IWITNESS_THEME_URL . '/css/compiled/global.css');
+}
+
+add_action('after_setup_theme', 'iwitness_add_editor_styles');
+
+/**
+ * Keep all images at high quality
+ */
+add_filter('jpg_quality', 'high_jpg_quality');
+function high_jpg_quality()
+{
+    return 100; // 100 mean 100%
+}
+
+// add ie conditional html5 shim to header
+function add_ie_html5_shim()
+{
+    echo '<!--[if lt IE 9]>';
+    echo '<script src="' . IWITNESS_THEME_URL . '/js/html5shiv-printshiv.js"></script>';
+    echo '<script src="' . IWITNESS_THEME_URL . '/js/respond.src.js"></script>';
+    echo '<![endif]-->';
+}
+
+add_action('wp_head', 'add_ie_html5_shim');
+
+/** Create Option Settings Page */
+/** Step 2 (from text above). */
+add_action('admin_menu', 'my_plugin_menu');
+
+/** Step 1. */
+function my_plugin_menu()
+{
+    add_options_page('iWitness Plugin Options', 'iWitness Settings ', 'manage_options', 'iwitness-unique-identifier', 'iwitness_plugin_options');
+}
+
+/** Step 3. */
+function iwitness_plugin_options()
+{
+    if (!current_user_can('manage_options')) {
+        wp_die(__('You do not have sufficient permissions to access this page.'));
+    }
+
+    echo '<form action="" method="POST" role="form">';
+    echo '<div class="wrap">';
+
+    echo 'API Site Url:';
+    echo '<input name="api_site_url" type="text" style="width: 100%;" value="' . (get_option(IWITNESS_API_URL_OPTION) ? get_option(IWITNESS_API_URL_OPTION) : '') . '">';
+
+    echo 'Number of contact on contact page:';
+    echo '<input name="num_of_contact_on_page" type="text" style="width: 100%;" value="' . (get_option(IWITNESS_NUM_CONTACT_ON_PAGE_OPTION) ? get_option(IWITNESS_NUM_CONTACT_ON_PAGE_OPTION) : '') . '">';
+
+    echo '<button name="action" value="iwitness_do_save_api_url" type="submit">Save</button>';
+    echo '</div>';
+    echo '</form>';
+}
+

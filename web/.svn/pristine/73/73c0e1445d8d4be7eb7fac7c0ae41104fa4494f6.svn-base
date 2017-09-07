@@ -1,0 +1,122 @@
+<div class="review">
+    <h3>Review your order</h3>
+    <hr/>
+
+    <div class="alert alert-info">
+        Your order will be complete as soon as you click "Place Your Order" on the this page.
+    </div>
+
+    <table class="table table-bordered">
+        <tr>
+            <th class="bg-grey">Item</th>
+            <th class="bg-grey">Unit Price</th>
+            <th class="bg-grey">Qty</th>
+            <th class="bg-grey">Cost</th>
+        </tr>
+        <tr data-for="plan" data-value="month" style="display:none">
+            <td>One Month Subscription</td>
+            <td>
+                $<?= $plans['month']['price'] ?></td>
+            <td>
+                1
+            </td>
+            <td>
+                $<?= $plans['month']['price'] ?></td>
+        </tr>
+        <tr data-for="plan" data-value="year" style="display:none">
+            <td class="first">One Year Subscription</td>
+            <td>
+                $<?= $plans['year']['price'] ?> </td>
+            <td>
+                1
+            </td>
+            <td>
+                $<?= $plans['year']['price'] ?> </td>
+        </tr>
+        <tr data-for="plan" data-value="2-years" style="display:none">
+            <td class="first">Two Year Subscription</td>
+            <td>
+                $<?= $plans['2-years']['price'] ?></td>
+            <td>
+                1
+            </td>
+            <td>
+                $<?= $plans['2-years']['price'] ?></td>
+        </tr>
+        <tr data-for="plan" data-value="seattleyear" style="display:none">
+            <td class="first">One Year Subscription</td>
+            <td>
+                $<?= $plans['seattleyear']['price'] ?></td>
+            <td>
+                1
+            </td>
+            <td>
+                $<?= $plans['seattleyear']['price'] ?></td>
+        </tr>
+        <tr data-for="plan" data-value="safekidyear" style="display:none">
+            <td class="first">One Year Subscription</td>
+            <td>
+                $<?= $plans['safekidyear']['price'] ?></td>
+            <td>
+                1
+            </td>
+            <td>
+                $<?= $plans['safekidyear']['price'] ?></td>
+        </tr>
+    </table>
+
+    <p class="text-muted small">
+        * Your membership will automatically renew every
+        <span data-for="plan" data-value="month">month.</span>
+        <span data-for="plan" data-value="year">year.</span>
+        <span data-for="plan" data-value="2-years">two years.</span>
+    </p>
+
+    <br>
+
+    <table class="table">
+        <tr>
+            <td class="bg-grey">
+                <h5>
+                    Bill Using
+                <span class="text-danger">
+                    <span data-name="cardtype"></span>&nbsp;ending in <span data-name="card_num"></span>
+                </span>
+                    &nbsp;to
+                </h5>
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                <p>
+                    <span data-name="first_name"></span>&nbsp;<span data-name="last_name"></span><br>
+                    <span data-name="address"></span>&nbsp;<span data-name="address2"></span><br>
+                    <span data-name="city"></span>&nbsp;<span data-name="state"></span>
+                        &nbsp;<span data-name="zip"></span>
+                    <span data-name="country"></span>
+                </p>
+            </td>
+        </tr>
+    </table>
+
+    <p>
+        <input id="agree" name="agree" type="checkbox" data-rule-required = "true"  data-msg-required = "You must agree to the terms and conditions to proceed">
+        <label for="agree">I agree to the <a href="/content-user-agreement" target="_blank">iWitness Licensed
+            Application End User Agreement</a>, Website <a href="/content-terms-of-use" target="_blank">Terms of Use</a> and <a href="/content-terms-of-service" target="_blank">Terms of Service</a></label>
+    </p>
+
+    <hr>
+
+    <div class="row">
+        <div class="col-md-6">
+            <button id="back" type="button" class="btn btn-default">Back</button>
+        </div>
+        <div class="col-md-6 text-right">
+            <button class="btn btn-primary" type="submit">
+                Place Your Order &raquo;
+            </button>
+        </div>
+    </div>
+
+</div>

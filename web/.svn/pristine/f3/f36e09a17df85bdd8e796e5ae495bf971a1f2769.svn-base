@@ -1,0 +1,158 @@
+<?php do_action('iwitness_print_notices'); ?>
+
+<h2>PROMOTIONAL CODES</h2>
+<p class="lead">Generate Promotional Codes</p>
+<hr>
+
+<form id="code-form" action="" method="POST" data-validate = "true" role="form">
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-group">
+                <label for="promotion_name" class="control-label">Promotion Name</label>
+                <input type="text" class="form-control" name="promotion_name" id="promotion_name"
+                       value="<?= $view_model['name']?>" data-rule-required="true">
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-group">
+                <div class="radio">
+                    <label class="control-label">
+                        <input type="radio" name="single" id="single_code" value="option1" <?= $view_model['single']=='option1' ? 'checked' : '' ?>>
+                        Single Code
+                    </label>
+                </div>
+                <div class="radio">
+                    <label class="control-label">
+                        <input type="radio" name="single" id="auto_generated" value="option2" <?= $view_model['single']=='option2' ? 'checked' : '' ?>>
+                        Auto Generated
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label for="promotion_code" class="control-label">Promo Codes</label>
+                <input type="text" class="form-control" name="promotion_code" id="promotion_code"
+                       value="<?= $view_model['code'] ?>" data-rule-required="true">
+            </div>
+        </div>
+        <div class="col-md-4" id="number-of-code-container">
+            <div class="form-group">
+                <label for="number_of_code" class="control-label">Number of Codes</label>
+                <input type="text" class="form-control" name="number_of_code" id="number_of_code"
+                       value="<?= $view_model['numberOfCode'] ?>" data-rule-min="1" data-rule-max="1000" data-rule-required="true">
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-group">
+                <label for="max_redemption" class="control-label">Max Redemptions</label>
+                <input type="text" class="form-control" name="max_redemption" id="max_redemption"
+                       value="<?= $view_model['maxRedemption'] ?>" data-rule-required="true" data-rule-positive-number>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-group">
+                <label for="datepicker_start_date" class="control-label">Redemption Start Date</label>
+                <input type="text" class="form-control" name="datepicker_start_date" id="datepicker_start_date"
+                       readonly="readonly" value="<?= $view_model['redemptionStartDate'] ?>">
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label for="datepicker_end_date" class="control-label">Redemption End Date</label>
+                <input type="text" class="form-control" name="datepicker_end_date" id="datepicker_end_date"
+                       readonly="readonly" value="<?= $view_model['redemptionEndDate'] ?>">
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-group">
+                <label for="subscription_length" class="control-label">Length of Subscription</label>
+                <select id="subscription_length" name="subscription_length" class="form-control">
+                    <?php
+                    iwitness_view_helper_select_options(
+                        $view_model['subscriptionLength'],
+                        array(
+                            '0' => '',
+                            '1' => '1',
+                            '2' => '2',
+                            '3' => '3',
+                            '4' => '4',
+                            '5' => '5',
+                            '6' => '6',
+                            '7' => '7',
+                            '8' => '8',
+                            '9' => '9',
+                            '10' => '10',
+                            '11' => '11',
+                            '12' => '12',
+                        )
+                    );
+                    ?>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label for="plan" class="control-label">Plan</label>
+                <select id="plan" name="plan" class="form-control"
+                        data-safekidyear-price ="<?= $view_model['plans']['safekidyear']['price']?>"
+                        data-safekidyear-length ="<?= $view_model['plans']['safekidyear']['length']?>"
+                        data-seattleyear-price ="<?= $view_model['plans']['seattleyear']['price']?>"
+                        data-seattleyear-length ="<?= $view_model['plans']['seattleyear']['length']?>"
+                        data-wsptayear-price ="<?= $view_model['plans']['wspta']['price']?>"
+                        data-wsptayear-length ="<?= $view_model['plans']['wspta']['length']?>" >
+                    <?php
+                    $plan = isset($view_model['plan']) ? $view_model['plan']  : '';
+                    iwitness_view_helper_select_options(
+                        $plan,
+                        array(
+                            '' => 'Please select ...',
+                            'free' => 'Free',
+                            'safekidyear' => 'Safe Kid Year',
+                            'seattleyear' => 'Seattle University Year',
+                            'wspta' => 'Washington State PTA Year',
+                        )
+                    );
+                    ?>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-group">
+                <label for="price" class="control-label">Price <span class="text-warning" >(Empty is free)</span></label>
+                <input type="text" class="form-control" name="price" id="price"
+                       value="<?= $view_model['price'] ?>">
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <br>
+            <input type="hidden" name="code_string" value="<?= $view_model['codeString'] ?>">
+            <button class="btn btn-primary"  type="submit" name="action" value="do_promotion_code">Save</button>
+        </div>
+    </div>
+
+</form>
+
+<?php
+// lazy loading style and script
+wp_print_scripts('iwitness-promotional-code-plugin');
+?>

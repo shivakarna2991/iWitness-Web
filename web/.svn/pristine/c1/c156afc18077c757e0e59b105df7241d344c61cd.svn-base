@@ -1,0 +1,57 @@
+<?php
+
+$plans = $view_model['plans'];
+
+$plugin_path = iWitness()->plugin_path();
+switch ($view_model['page']) {
+    case "common":
+    case "renew":
+        $plan_template = $plugin_path . '/templates/partial/common-plan.php';
+        break;
+    case "seattleu":
+        $plan_template = $plugin_path . '/templates/partial/seattle-university-plan.php';
+        break;
+    case "safekids":
+        $plan_template = $plugin_path . '/templates/partial/safe-kid-plan.php';
+        break;
+    case "wspta":
+        $plan_template = $plugin_path . '/templates/partial/wspta-plan.php';
+        break;
+    case "student":
+        $plan_template = $plugin_path . '/templates/partial/student-plan.php';
+        break;
+}
+?>
+
+<?php do_action('iwitness_print_notices'); ?>
+
+<?php include_once($plugin_path . '/templates/partial/subscription-notice.php'); ?>
+
+<?php include_once($plugin_path . '/templates/partial/other-platform-notification.php'); ?>
+
+    <form role="form" action="" method="POST" id="order">
+        <div class="purchase order-form">
+            <input type="hidden" name="action" value="iwitness_do_place_your_order"/>
+            <h2>Purchase</h2>
+
+            <p class="lead">Three easy steps to register</p>
+            <hr/>
+
+            <h3>Step 1) Choose your smartphone</h3>
+            <?php include_once($plugin_path . '/templates/partial/choose-smart-phone.php'); ?>
+
+            <div id="step2">
+                <?php include_once($plan_template); ?>
+            </div>
+
+            <h3>Step 3) Payment information</h3>
+
+            <?php include_once($plugin_path . '/templates/partial/payment-info.php'); ?>
+
+        </div>
+
+        <!-- Review region -->
+        <?php include_once($plugin_path . '/templates/partial/review-purchase.php'); ?>
+    </form>
+
+<?php wp_print_scripts('iwitness-purchase-plugin'); ?>

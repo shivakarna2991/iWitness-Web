@@ -1,0 +1,144 @@
+<?php
+
+require_once(iWitness()->plugin_path() . '/includes/api/iwitness-api-client-functions.php');
+
+
+/**
+ * Authenticate user
+ * @param $user
+ * @param $username
+ * @param $password
+ * @return bool|WP_Error|WP_User
+ */
+function iwitness_authenticate_username_password($user, $username, $password)
+{
+    // If a previous hook has successfully logged the user in, do not process further
+    if (is_a($user, 'WP_User')) return $user;
+
+    //all others users must login via Oauth 2 provider server
+    // Ensure details have been entered
+    if (empty($username) || empty($password)) {
+        $error = new WP_Error();
+        if (empty($username))
+            $error->add('empty_username', __('<strong>ERROR</strong>: The username field is empty.'));
+        if (empty($password))
+            $error->add('empty_password', __('<strong>ERROR</strong>: The password field is empty.'));
+        return $error;
+    }
+
+    iwitness_log_debug('Begin to login to the system ');
+
+    /** @var iWitness $iWitness */
+    $iWitness = iWitness();
+
+    //let admin login by himself
+    $login_user = get_user_by('login', $username);
+
+    if ($login_user) {
+        iwitness_log_debug('User is existing in database');
+        $api_json = get_user_meta($login_user->ID, $iWitness->user_meta_api_identity(), true);
+        if (false === $api_json) {
+            iwitness_log_debug('Not associate with API server. Login by normal WP account');
+            return;
+        }
+    }
+    iwitness_log_debug('This is new user. Login by API account ' . $username);
+
+    // Attempt to authenticate user
+    try {
+        iwitness_log_debug('Begin to authenticate API user by user name, password ');
+        $token = iwitness_authenticate_user($username, $password);
+
+        iwitness_log_debug('Begin to update new user info into WP DB');
+        $token = iwitness_update_user_info_from_api($token, $username);
+
+        iwitness_log_debug('Recheck user in an WP DB');
+
+        // Return valid user object
+        $user = get_user_by('login', $token->user_id);
+        if($user === false){
+            iwitness_log_debug('User does not exist');
+        }
+        return $user;
+
+    } catch (\Exception $ex) {
+        iwitness_log_error('Exception  = ' . $ex->getMessage());
+        return new WP_Error(
+            'invalid_username',
+            '<strong>ERROR</strong>: ' . $ex->getMessage()
+        );
+    }
+}
+
+
+/**
+ *
+ */
+function iwitness_logout()
+{
+    //Process logout here
+    if (session_id()) {
+        session_destroy();
+    }
+}
+
+//add_action('wp_logout', 'iwitness_logout');
+
+
+/**
+ * WP register user
+ * @param $id
+ */
+function iwitness_register($id)
+{
+    //$user_data = get_user_by('id', $id);
+    //$username = $user_data['user_login'];
+    //$password = $_POST['password'];
+    //Ensure your system applies appropriate sanitization to the password
+    //create_new_user($username, $password);
+}
+
+//add_action('user_register', 'iwitness_register', 20, 1);
+
+
+function iwitness_reset($user, $new_pass)
+{
+    reset_user_password($user['user_login'], $new_pass);
+}
+
+//add_action('password_reset', 'iwitness_reset', 20, 2);
+
+
+/**
+ * Use avatars in priority order
+ * @author Aaron Oneal
+ * @link http://aarononeal.info
+ *
+ */
+function iwitness_filter_avatar($avatar, $id_or_email, $size, $default, $alt)
+{
+    $custom_avatar = '';
+    $user_id = (!is_integer($id_or_email) && !is_string($id_or_email) && get_class($id_or_email)) ? $id_or_email->user_id : $id_or_email;
+
+    if (!empty($user_id)) {
+
+        $api_user = iwitness_get_api_user_from_meta($user_id);
+        if ($api_user) {
+            $custom_avatar = $api_user->photoUrl;
+        }
+    }
+
+    if (!empty($custom_avatar)) {
+        // return the custom avatar from the social network
+        $return = '<img class="avatar" src="' . $custom_avatar . '" style="width:' . $size . 'px" alt="' . $alt . '" />';
+    } else if ($avatar) {
+        $return = $avatar;
+    } else {
+        // default
+        $return = '<img class="avatar" src="' . $default . '" style="width:' . $size . 'px" alt="' . $alt . '" />';
+    }
+
+    return $return;
+}
+
+add_filter('get_avatar', 'iwitness_filter_avatar', 10, 5);

@@ -1,0 +1,393 @@
+<?php do_action('iwitness_print_notices'); ?>
+
+<?php
+/** @var iWitness_User $user */
+$user = $view_model['api_user'];
+$contact = $view_model['contact'];
+$user_token = iwitness_get_current_user_access_token();
+
+?>
+
+<div id="profile" data-user-id="<?php echo $user_token ? $user_token->user_id: '' ?>">
+    <h2>My Profile</h2>
+    <p class="lead">Manage your personal profile</p>
+    <hr>
+
+    <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
+            <div id="upload-container" >
+
+                <img data-src="holder.js/100%x180"
+                     id="profile-photo" src="<?php echo $user->get_user_image(); ?>"
+                     class="img-responsive center-block" alt="No Image"
+                     onerror="this.src='<?php echo iWitness_User::get_anonymous_profile_image(); ?>'">
+
+                <a id="select-photo" class="btn btn-primary btn-sm btn-block" href="#" >Upload Photo</a>
+
+                <a class="btn btn-primary btn-sm btn-block"
+                   href="<?php echo iwitness_get_page_path(IWITNESS_PAGE_USER_PROFILE_VIEW_ID . '/' . IWITNESS_PAGE_RESET_PASSWORD_ID); ?>">
+                    Reset Password</a>
+
+                <div class="hide">
+                    <!--
+                        Stuff like this needs a common implementation that can be used for any progress indication or messaging.
+                        Not inline between buttons...
+                     -->
+                    <p class="navbar-left" id="console"></p>
+                    <img id="upload-loader" src="<?php echo get_bloginfo('template_directory'); ?>/images/ajax-loader.gif" alt="Loading..." style="display: none;" width="16">
+                </div>
+
+            </div>
+
+
+            <dl>
+                <dt>Wireless Number</dt>
+                <dd>
+                    <?= sanitize_text_field($user->phone) ?> &nbsp;
+                    <a class="small" href="<?php echo iwitness_get_page_path(IWITNESS_PAGE_USER_PROFILE_VIEW_ID.'/'.IWITNESS_PAGE_CHANGE_NUMBER_ID); ?>">
+                        (Change)
+                    </a>
+                </dd>
+            </dl>
+
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-9 col-lg-9">
+
+            <?php if (
+                !$user->timezone ||
+                !$user->address1 ||
+                !$user->city ||
+                !$user->state ||
+                !$user->zip ||
+                !($user->heightInches || $user->heightFeet) ||
+                !$user->weight ||
+                !$user->gender ||
+                !$user->birthDate ||
+                !$user->eyeColor ||
+                !$user->hairColor ||
+                !$user->ethnicity ||
+                !$user->distFeature ||
+                !$contact['total']
+            ): ?>
+                <div class="alert alert-warning">
+                    <h4>You're profile is incomplete</h4>
+                    <p>
+                        We recommend you complete your profile information to help ensure your safety.
+                    </p>
+                </div> <!-- end of alert box -->
+            <?php endif; ?>
+
+            <form id="profile-form" action="" method="POST" data-validate="true" role="form">
+
+                <div class="form-horizontal">
+                    <div class="form-group <?php echo empty($user->firstName) ? 'error' : '' ?>">
+                        <label for="first_name" class="col-md-3 control-label">
+                            First Name <span class="text-danger">*</span>
+                        </label>
+
+                        <div class="col-md-9">
+                            <input type="text" class="form-control" id="first_name" name="first_name"
+                                   value="<?= sanitize_text_field($user->firstName) ?>" placeholder="Enter First Name"
+                                   data-rule-maxlength="20" data-rule-required="true">
+                        </div>
+                    </div>
+
+                    <div class="form-group <?php echo empty($user->lastName) ? 'error' : '' ?>">
+                        <label for="last_name" class="col-md-3 control-label">
+                            Last Name <span class="text-danger">*</span>
+                        </label>
+
+                        <div class="col-md-9">
+                            <input type="text" class="form-control" id="last_name" name="last_name"
+                                   value="<?= sanitize_text_field($user->lastName) ?>" placeholder="Enter Last Name"
+                                   data-rule-maxlength="20" data-rule-required="true">
+                        </div>
+                    </div>
+
+                    <div class="form-group <?php echo empty($user->email) ? 'error' : '' ?>">
+                        <label for="email" class="col-md-3 control-label">
+                            Email <span class="text-danger">*</span>
+                        </label>
+
+                        <div class="col-md-9">
+                            <input type="email" class="form-control" id="email" name="email"
+                                   value="<?= sanitize_email($user->email) ?>" placeholder="Enter Email"
+                                   data-rule-maxlength="50" data-rule-required="true">
+                        </div>
+                    </div>
+
+                    <div class="form-group <?php echo empty($user->address1) ? 'error' : '' ?>">
+                        <label for="address_1" class="col-md-3 control-label">
+                            Address <span class="text-danger">*</span>
+                        </label>
+
+                        <div class="col-md-9">
+                            <input type="text" class="form-control" id="address_1" name="address_1"
+                                   value="<?= sanitize_text_field($user->address1) ?>" placeholder="Enter Address"
+                                   data-rule-maxlength="100" data-rule-required="true">
+                        </div>
+                    </div>
+
+                    <div class="form-group <?php echo empty($user->address2) ? 'error' : '' ?>">
+                        <label for="address_2" class="col-md-3 control-label">Address 2</label>
+
+                        <div class="col-md-9">
+                            <input type="text" class="form-control" id="address_2" name="address_2"
+                                   value="<?= sanitize_text_field($user->address2) ?>" placeholder="Enter Address 2"
+                                   data-rule-maxlength="100">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+
+                        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                            <div class="form-horizontal">
+
+                                <div class="form-group <?php echo empty($user->city) ? 'error' : '' ?>">
+                                    <label for="city" class="col-md-3 control-label">City</label>
+
+                                    <div class="col-md-9">
+                                        <input type="text" class="form-control" id="city" name="city"
+                                               value="<?= sanitize_text_field($user->city) ?>" placeholder="Enter City"
+                                               data-rule-maxlength="30">
+                                    </div>
+                                </div>
+
+                                <div class="form-group <?php echo empty($user->heightFeet) || empty($user->heightInches) ? 'error' : '' ?>">
+                                    <label for="height_inches" class="col-md-3 control-label">Height</label>
+
+                                    <div class="col-md-9">
+                                        <div class="form-inline btn-group">
+                                            <select id="height_feet" name="height_feet" class="form-control" style="width: 48%;">
+                                                <?php
+                                                iwitness_view_helper_select_options(
+                                                    $user->heightFeet,
+                                                    array(
+                                                        '' => '...',
+                                                        '0' => '0 ft',
+                                                        '1' => '1 ft',
+                                                        '2' => '2 ft',
+                                                        '3' => '3 ft',
+                                                        '4' => '4 ft',
+                                                        '5' => '5 ft',
+                                                        '6' => '6 ft',
+                                                        '7' => '7 ft'
+                                                    )
+                                                )?>
+                                            </select>
+                                            <select id="height_inches" name="height_inches" class="form-control" style="width: 48%;">
+                                                <?php
+                                                iwitness_view_helper_select_options($user->heightInches, array(
+                                                    '' => '...',
+                                                    '0' => '0 in',
+                                                    '1' => '1 in',
+                                                    '2' => '2 in',
+                                                    '3' => '3 in',
+                                                    '4' => '4 in',
+                                                    '5' => '5 in',
+                                                    '6' => '6 in',
+                                                    '7' => '7 in',
+                                                    '8' => '8 in',
+                                                    '9' => '9 in',
+                                                    '10' => '10 in',
+                                                    '11' => '11 in',
+                                                )); ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group <?php echo empty($user->eyeColor) ? 'error' : '' ?>">
+                                    <label for="eye_color" class="col-md-3 control-label">Eye color</label>
+
+                                    <div class="col-md-9">
+                                        <select id="eye_color" name="eye_color" class="form-control valid">
+                                            <?php
+                                            iwitness_view_helper_select_options(
+                                                $user->eyeColor,
+                                                array(
+                                                    '' => 'Select...',
+                                                    'Black' => 'Black',
+                                                    'Blue' => 'Blue',
+                                                    'Brown' => 'Brown',
+                                                    'Hazel' => 'Hazel',
+                                                    'Gray' => 'Gray',
+                                                    'Green' => 'Green',
+                                                    'Other' => 'Other',
+                                                )
+                                            );
+                                            ?>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group <?php echo empty($user->gender) ? 'error' : '' ?>">
+                                    <label for="gender" class="col-md-3 control-label">Gender</label>
+
+                                    <div class="col-md-9">
+                                        <select name="gender" id="gender" class="form-control">
+                                            <?php
+                                            iwitness_view_helper_select_options(
+                                                $user->gender === null ? '' : ($user->gender == true ? 1 : 0),
+                                                array(
+                                                     '' => 'Select...',
+                                                     '1' => 'male',
+                                                     '0' => 'female'
+                                                ), true
+                                            );
+                                            ?>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group <?php echo empty($user->state) ? 'error' : '' ?>">
+                                    <label for="st" class="col-md-3 control-label">State</label>
+
+                                    <div class="col-md-9">
+                                        <select id="st" name="st" class="form-control">
+                                            <?php
+                                            iwitness_view_helper_select_options(
+                                                $user->state,
+                                                array_merge(array('' => 'Please select...'), iwitness_get_states())
+                                            );
+                                            ?>
+                                        </select>
+
+                                    </div>
+                                </div>
+
+                                <div class="form-group <?php echo empty($user->weight) ? 'error' : '' ?>">
+                                    <label for="weight" class="col-md-3 control-label">Weight</label>
+
+                                    <div class="col-md-9">
+                                        <?php $keys = range(10, 500, 10);
+                                        $vals = array(); ?>
+                                        <?php foreach ($keys as $key) $vals[] = "$key lb"; ?>
+                                        <select id="weight" name="weight" class="form-control">
+                                            <?php
+                                            iwitness_view_helper_select_options($user->weight, array('' => 'Select...') + array_combine($keys, $vals));
+                                            ?>
+                                        </select>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                            <div class="form-horizontal">
+
+                                <div class="form-group <?php echo empty($user->hairColor) ? 'error' : '' ?>">
+                                    <label for="hair_color" class="col-md-3 control-label">Hair color</label>
+
+                                    <div class="col-md-9">
+                                        <select id="hair_color" class="form-control valid" name="hair_color">
+                                            <?php
+                                            iwitness_view_helper_select_options(
+                                                $user->hairColor,
+                                                array(
+                                                    '' => 'Select...',
+                                                    'Blond' => 'Blond',
+                                                    'Red' => 'Red',
+                                                    'Brown' => 'Brown',
+                                                    'Black' => 'Black',
+                                                    'Gray' => 'Gray',
+                                                    'White' => 'White',
+                                                    'Other' => 'Other',
+                                                )
+                                            );
+                                            ?>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group <?php echo empty($user->timezone) ? 'error' : '' ?>">
+                                    <label for="timezone" class="col-md-3 control-label">Timezone</label>
+
+                                    <div class="col-md-9">
+                                        <select id="timezone" name="timezone" class="form-control">
+                                            <?php
+                                            iwitness_view_helper_select_options(
+                                                $user->timezone,
+                                                array('' => 'Select...') + iwitness_get_time_zone_options()
+                                            );
+                                            ?>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group <?php echo empty($user->zip) ? 'error' : '' ?>">
+                                    <label for="zip" class="col-md-3 control-label">Zip</label>
+
+                                    <div class="col-md-9">
+                                        <input type="text" class="form-control" id="zip" name="zip"
+                                               value="<?= sanitize_text_field($user->zip) ?>" placeholder="Enter Zip"
+                                               data-rule-maxlength="9">
+                                    </div>
+                                </div>
+
+                                <div class="form-group <?php echo empty($user->birthDate) ? 'error' : '' ?>">
+                                    <label for="birth_date" class="col-md-3 control-label">Birthday</label>
+
+                                    <div class="col-md-9">
+                                        <input type="text" class="form-control" id="birth_date" name="birth_date"
+                                               value="<?php echo iwitness_view_helper_format_date($user->birthDate) ?>"
+                                               data-rule-date = "true" placeholder="mm/dd/yy">
+                                        <label for="birth_date" class="error" style="display:none;">Please enter a valid date in
+                                            format:mm/dd/yyyy</label>
+                                    </div>
+                                </div>
+
+                                <div class="form-group <?php echo empty($user->ethnicity) ? 'error' : '' ?>">
+                                    <label for="ethnicity" class="col-md-3 control-label">Ethnicity</label>
+
+                                    <div class="col-md-9">
+                                        <select id="ethnicity" class="form-control valid" name="ethnicity">
+                                            <?php
+                                            iwitness_view_helper_select_options(
+                                                $user->ethnicity,
+                                                array(
+                                                    '' => 'Select...',
+                                                    'White/Caucasian' => 'White/Caucasian',
+                                                    'Black/African American' => 'Black/African American',
+                                                    'Hispanic/Latino' => 'Hispanic/Latino',
+                                                    'Asian/Pacific Islander' => 'Asian/Pacific Islander',
+                                                    'Native American' => 'Native American',
+                                                    'Other' => 'Other'
+                                                )
+                                            );
+                                            ?>
+                                        </select>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="form-group <?php echo empty($user->distFeature) ? 'error' : '' ?>">
+                        <label for="dist_feature" class="control-label">Distinguishing Features</label>
+                        <textarea name="dist_feature" class="form-control" rows="5"
+                                  id="dist_feature"><?= esc_textarea($user->distFeature) ?></textarea>
+
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary" name="action" value="do_update_user_profile">SAVE</button>
+                    </div>
+
+                </div>
+
+            </form>
+        </div>
+
+    </div> <!-- end of row container -->
+</div><!-- end of profile container -->
+
+<?php
+// lazy loading style and script
+wp_print_scripts('plupload');
+wp_print_scripts('iwitness-profile-edit-plugin');
+?>

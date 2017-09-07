@@ -1,0 +1,157 @@
+<?php
+//must create this file because ajax doesn't work if its function were put on a class
+
+/**
+ * Validate promotion code
+ */
+function validate_promotion_code_callback()
+{
+    $promoCode = iwitness_get_submit_value('promoCode');
+    if (empty($promoCode)) {
+        echo '"Please enter Promo code"';
+        die;
+    }
+    try {
+         iwitness_api_get('/subscription/validate/promo/' . $promoCode);
+        echo "true";
+    } catch (Exception $ex) {
+        iwitness_log_error($ex);
+        echo '"' . $ex->getMessage() . '"';
+    }
+    die;
+}
+
+/**
+ * Validate phone number exists
+ */
+function validate_phone_number_callback()
+{
+    $phone = iwitness_get_post_field_phone_number('phone');
+
+    if (empty($phone)) {
+        echo '"Please enter phone number"';
+        die;
+    }
+
+    try {
+        $response = iwitness_api_get('/user/validate/phone/' . $phone);
+        if (isset($response['status']) && $response['status'] == 200) {
+            echo "true";
+        } else {
+            echo "false";
+        }
+    } catch (Exception $ex) {
+        iwitness_log_error($ex);
+        echo '"' . $ex->getMessage() . '"';
+    }
+    die;
+}
+
+
+function validate_validate_email_duplicate_callback()
+{
+    $email = iwitness_get_submit_value('email');
+    if (empty($email)) {
+        echo "false";
+        die;
+    }
+
+    $login_user = get_user_by('email', $email);
+    if ($login_user instanceof WP_User) {
+        echo "false";
+        die;
+    }
+    echo "true";
+    die;
+}
+
+function validate_validate_gift_card_email_callback()
+{
+    $email = iwitness_get_submit_value('email');
+    if (empty($email)) {
+        echo '"Please enter email"';
+        die;
+    }
+
+    try {
+        iwitness_api_get('/subscription/validate/email/' . $email);
+        echo "true";
+    } catch (Exception $ex) {
+        iwitness_log_error($ex);
+        echo '"' . $ex->getMessage() . '"';
+    }
+    die;
+}
+
+
+/**
+ * @param $key
+ * @param string $default
+ * @return string
+ */
+function iwitness_get_submit_value($key, $default = '')
+{
+    $value = $default;
+
+    if (isset($_GET[$key])) {
+        $value = $_GET[$key];
+    }
+
+    if (isset($_POST[$key])) {
+        $value = $_POST[$key];
+    }
+
+    return $value;
+}
+
+/**
+ * Get messages callback
+ */
+function iwitness_get_message_callback()
+{
+    try {
+        $page = 1;
+        if(isset($_GET['page'])) {
+            $page = $_GET['page'];
+        }
+
+        $messages = iwitness_api_get('/message', array('page' => $page));
+        $messages = iwitness_api_response_filter($messages, 'message');
+
+        $temps = array(
+            'total' => count($messages)
+        );
+
+        if(count($messages) > 0) {
+            foreach ($messages as $index => $message) {
+                $message['created'] = date('g:i A', $message['created']);
+                $temps['data'][] = $message;
+            }
+        }
+
+        header("Content-type: application/json");
+        echo json_encode($temps);
+    } catch (Exception $ex) {
+        iwitness_log_error($ex);
+    }
+    die;
+}
+
+/**
+ * Get message page callback
+ */
+function iwitness_get_total_page_message_callback()
+{
+    try {
+        $messages = iwitness_api_get('/message');
+        header("Content-type: application/json");
+        echo json_encode(array(
+            'pageCount' => $messages['page_count'],
+            'pageSize' => $messages['page_size'],
+            'totalItems' => $messages['total_items']
+        ));
+    } catch (Exception $ex) {
+        iwitness_log_error($ex);
+    }
+    die;
+}

@@ -1,0 +1,79 @@
+<?php
+
+add_action('wp_ajax_iwitness_admin_get_users', 'iwitness_admin_get_users');
+add_action('wp_ajax_iwitness_do_admin_suspend_user', 'iwitness_do_admin_suspend_user');
+add_action('wp_ajax_iwitness_do_admin_delete_user', 'iwitness_do_admin_delete_user');
+
+function iwitness_admin_get_users()
+{
+    try {
+        $searchText = iwitness_get_post_field_value('searchPhrase');
+        $currentPage = iwitness_get_post_field_value('current');
+        $pageSize = iwitness_get_post_field_value('rowCount');
+
+        $query = '/user?' . http_build_query(
+                array(
+                    'page' => $currentPage,
+                    'size' => $pageSize,
+                ));
+
+        if (!empty($searchText)) {
+            $query = $query . '&first_name_search=' . $searchText;
+        }
+
+        $users = iwitness_api_get($query);
+        $result = array(
+            'current' => intval($currentPage),
+            'rowCount' => $users['page_size'],
+            'total' => $users['total_items'],
+            'rows' => $users['_embedded']['user']
+        );
+
+        header("Content-type: application/json");
+        echo json_encode($result);
+    } catch (Exception $ex) {
+        iwitness_log_error($ex);
+    }
+    die;
+}
+
+function iwitness_do_admin_suspend_user()
+{
+    try {
+        // get data from the form
+        $user_id = iwitness_get_post_field_value('user_id');
+
+        // do validation
+        iwitness_show_empty_error_message($user_id, 'user id');
+
+        $data = array(
+            'id' => $user_id,
+            'suspended' => iWitness_Admin_Form_Handler::SUSPEND
+        );
+
+        $response = iwitness_api_patch('/user/' . $user_id, array('body' => $data));
+        header("Content-type: application/json");
+        echo json_encode($response);
+    } catch (Exception $ex) {
+        iwitness_log_error($ex);
+    }
+    die;
+}
+
+function iwitness_do_admin_delete_user()
+{
+    try {
+        // get data from the form
+        $user_id = iwitness_get_post_field_value('user_id');
+
+        // do validation
+        iwitness_show_empty_error_message($user_id, 'user id');
+
+        $response = iwitness_api_delete('/user/' . $user_id);
+        header("Content-type: application/json");
+        echo json_encode($response);
+    } catch (Exception $ex) {
+        iwitness_log_error($ex);
+    }
+    die;
+}

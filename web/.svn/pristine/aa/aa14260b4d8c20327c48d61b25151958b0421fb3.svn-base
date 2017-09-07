@@ -1,0 +1,112 @@
+;
+(function ($) {
+    "use strict";
+
+    $().ready(function () {
+        UserEventReport.init();
+    });
+
+    var UserEventReport = (function () {
+        var $userTableContainer = $('#user-event-table-container'),
+            $userTable = $userTableContainer.find('table'),
+            $userSelect = $('#select2-user'),
+            $search = $('#search');
+
+        function init() {
+            // binding user table
+            $userTableContainer.iwBindingTable();
+
+            // binding select control
+            bindSelectControl();
+
+            // binding search event
+            bindSearch();
+        }
+
+        function bindSelectControl() {
+            var settings = {
+                    placeholder: "Type display name",
+                    multiple: false
+                },
+                ajaxSettings = {
+                    url: $.iw.getApiUrl() + '/search/user',
+                    data: function (term, page) {
+                        return {
+                            'term': term
+                        };
+                    },
+                    results: function (data, page) {
+                        if (!data.user) {
+                            error('Cannot find out data source for user');
+                        }
+                        var results = $.map(data.user, function (user, index) {
+                            var fullName = user.firstName != null ? user.firstName : '';
+                            fullName += ' ' + (user.lastName != null ? user.lastName : '');
+                            fullName += ' ' + (user.phone != '' ? user.phone : '');
+
+                            return {
+                                id: user.id,
+                                text: fullName
+                            }
+                        });
+                        return {results: results};
+                    }
+                };
+
+            $userSelect.iwBindingSelect2(settings, ajaxSettings);
+            $userSelect.val('');
+        }
+
+        function bindSearch() {
+            $search.on('click', function (e) {
+                e.preventDefault();
+                getRemoteData({'userId': $userSelect.val()});
+            });
+        }
+
+        function getRemoteData($params) {
+            $(this)
+                .iwGetRemoteData(buildSearchQuery($params))
+                .done(function (data) {
+
+                    $userTable.find("tbody").find('tr').remove(); // remove old data first
+                    if (data._embedded && data._embedded.event.length > 0) {
+                        var body = buildTableBody(data._embedded.event);
+
+                        $('#no-record').addClass('hide');
+                        $userTable.find("tbody").append($(body).find('tr'));
+                    } else {
+                        $('#no-record').removeClass('hide');
+                    }
+
+                    $userTable.trigger("update");
+                });
+        }
+
+        function buildSearchQuery(params) {
+            if (!params.userId) {
+                alert('Please input user name for searching');
+                return; // don't do anything
+            }
+            return "/user/" + params.userId + "/event?sort=+created";
+        }
+
+        function buildTableBody(data) {
+            var $trowTemplate = $('#table-row-template', $userTableContainer),
+                $trow = $('<tbody/>');
+
+            $.each(data, function (index, item) {
+                $.extend(true, item, {'index': index + 1}); // extend one more column for index
+                var $row = $('<tr/>').loadTemplate($trowTemplate, item);
+                $trow.append($row);
+            });
+
+            return $trow;
+        }
+
+        return {
+            init: init
+        };
+    })();
+
+})(jQuery);

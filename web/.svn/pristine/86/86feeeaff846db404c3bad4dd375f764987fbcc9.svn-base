@@ -1,0 +1,30 @@
+#!/bin/bash
+
+WEB_USER="www-data"
+
+
+echo "grant write to wp-content"
+sudo chown -R $WEB_USER:$WEB_USER ../public/wp-content
+
+echo "Please make sure you have installed and configured database before running this script."
+echo "Current developer domain name: http://wordpress.hung.dev-vn.webonyx.local"
+echo "Please enter iWitness testing/production domain name (example http://www.iwitness.com) : "
+echo "keep it empty if you don't want to change"
+
+read iwitness_domain
+
+
+if [ -n "$iwitness_domain" ]; then
+    echo "Change from 'http://iwitness.dev.webonyx.com' to '$iwitness_domain'"
+    php wp-cli.phar search-replace 'http://iwitness.dev.webonyx.com'  $iwitness_domain --path='../public' --allow-root
+else
+    echo "Nothing change on your database"
+fi
+
+echo "Compile CSS"
+./css-compiler build
+
+# standard command ./doctrine migrations:migrate [--show-versions] [--configuration[="..."]] [--db-configuration[="..."]] [--release="..."] [--host[="..."]] [--dbname[="..."]] [--user[="..."]] [--password[="..."]]
+echo "Please run command './doctrine migrations:migrate --release production --host --dbname --user --password'  to update your database"
+
+

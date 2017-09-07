@@ -1,0 +1,295 @@
+<?php
+/**
+ * iWitness_Purchase_Shortcodes class.
+ *
+ * @class       iWitness_User_Shortcodes
+ * @version     1.0.0
+ * @package     iWitness/Classes
+ * @category    Class
+ * @author      iWitness
+ */
+
+if (!defined('ABSPATH')) exit; // Exit if accessed directly
+if (!class_exists('iWitness_Purchase_Shortcodes')) :
+
+
+    class iWitness_Purchase_Shortcodes
+    {
+        public function __construct()
+        {
+            // for purchase
+            add_shortcode('iwitness_buy_now', array($this, 'buy_now_view'));
+            add_shortcode('iwitness_special_seattle_university_pricing', array($this, 'special_seattle_university_pricing'));
+            add_shortcode('iwitness_special_boys_and_girls_club_pricing', array($this, 'special_boys_and_girls_club_pricing'));
+            add_shortcode('iwitness_special_washington_state_pta_pricing', array($this, 'special_washington_state_pta_pricing'));
+            add_shortcode('iwitness_special_student_pricing', array($this, 'special_student_pricing'));
+            add_shortcode('iwitness_special_promo_pricing', array($this, 'special_promo_pricing'));
+            add_shortcode('iwitness_use_promo_code', array($this, 'use_promo_code'));
+            add_shortcode('iwitness_subscription_renew', array($this, 'subscription_renew'));
+            add_shortcode('iwitness_buy_gift_cards', array($this, 'buy_gift_cards'));
+            add_shortcode('iwitness_congratulation', array($this, 'congratulation'));
+            add_shortcode('iwitness_claim_code', array($this, 'claim_code'));
+        }
+
+        /**
+         * @return string
+         */
+        public static function  subscription_renew()
+        {
+            return self::render_buy_now_view('renew');
+        }
+
+        /**
+         * Generic $14.95 'university' rate promo page
+         */
+        public static function special_student_pricing()
+        {
+            return self::render_buy_now_view('student');
+        }
+
+        /**
+         * Generic $14.95 'university' rate promo page
+         */
+        public static function special_promo_pricing()
+        {
+            return self::render_buy_now_view('promo');
+        }
+
+
+        /**
+         * Render buying form for seattle university
+         */
+        public static function special_seattle_university_pricing()
+        {
+            return self::render_buy_now_view('seattleu');
+        }
+
+        /**
+         * Render buying form for boys and girls club
+         */
+        public static function special_boys_and_girls_club_pricing()
+        {
+            return self::render_buy_now_view('safekids');
+
+        }
+
+        /**
+         * Render buying form for seattle university
+         */
+        public static function special_washington_state_pta_pricing()
+        {
+            return self::render_buy_now_view('wspta');
+        }
+
+
+        /**
+         * Buy Now shortcode
+         *
+         * @access public
+         * @return string
+         */
+        public static function buy_now_view()
+        {
+            return self::render_buy_now_view('common');
+        }
+
+        /**
+         * @param $page
+         * @return string
+         */
+        private static function render_buy_now_view($page)
+        {
+            return iwitness_render_view(
+                'purchase/buy-now',
+                function () use ($page) {
+                    if ($page == 'renew') {
+                        return (iwitness_is_api_user());
+                    } else {
+                        return true;
+                    }
+                },
+
+                function () use ($page) {
+                    if (iwitness_validate_submit('iwitness_do_place_your_order', false)) {
+                        if (isset($_POST['iwitness_do_place_your_order_data'])) {
+                            $view_model = $_POST['iwitness_do_place_your_order_data'];
+                        }
+                    }
+
+                    if (!isset($view_model)) {
+                        $view_model = self::get_default_payment_info(true, $page == 'renew');
+                    }
+                    $view_model['page'] = $page;
+                    $view_model['plans'] = iwitness_get_plans();
+
+                    $view_model['api_user'] = iwitness_get_current_api_user(false);
+                    return $view_model;
+                }
+            );
+        }
+
+
+        /**
+         * use promotion shortcode
+         *
+         * @access public
+         * @return string
+         */
+        public static function use_promo_code()
+        {
+            return iwitness_render_view(
+                'purchase/use-promo-code',
+                null,
+                function () {
+                    $view_model = array(
+                        'originalPhoneModel' => 'iphone4',
+                        'promoCode' => '',
+                    );
+                    if (iwitness_validate_submit('iwitness_do_use_promo_code', false)) {
+                        if (isset($_POST['iwitness_do_use_promo_code_data'])) {
+                            $view_model = $_POST['iwitness_do_use_promo_code_data'];
+                        }
+                    }
+
+                    if (empty($view_model['promoCode']) &&
+                        isset($_GET['code']) &&
+                        !empty($_GET['code'])
+                    ) {
+                        $view_model['promoCode'] = $_GET['code'];
+                    }
+
+                    return $view_model;
+                }
+            );
+        }
+
+        /**
+         * use promotion shortcode
+         *
+         * @access public
+         * @return string
+         */
+        public static function claim_code()
+        {
+            return self::use_promo_code();
+        }
+
+        /**
+         * @return string
+         */
+        public static function buy_gift_cards()
+        {
+            return iwitness_render_view(
+                'gift/gift-card',
+                null,
+                function () {
+                    if (iwitness_validate_submit('iwitness_do_place_your_order', false)) {
+                        if (isset($_POST['iwitness_do_place_your_order_data'])) {
+                            $view_model = $_POST['iwitness_do_place_your_order_data'];
+                        }
+                    }
+                    if (!isset($view_model)) {
+                        $view_model = self::get_default_payment_info(true);
+                        $api_user = iwitness_get_current_api_user(false);
+                        if ($api_user) {
+                            $view_model['senderName'] = $api_user->firstName . ' ' . $api_user->lastName;
+                            $view_model['senderEmail'] = $api_user->email;
+                            $view_model['senderVerifyEmail'] = $api_user->email;
+                        } else {
+                            $view_model['senderName'] = '';
+                            $view_model['senderEmail'] = '';
+                            $view_model['senderVerifyEmail'] = '';
+                        }
+                        $view_model['recipients'] = json_encode(array());
+                    }
+                    $view_model['plans'] = iwitness_get_plans();
+                    return $view_model;
+                }
+            );
+        }
+
+        /**
+         * @return string
+         */
+        public static function congratulation()
+        {
+            $id = isset($_GET['id']) ? $_GET['id'] : '';
+            $key = 'recipients_' . $id;
+
+            $session = iWitness()->session();
+            $recipients = array();
+            if (isset($session[$key])) {
+                $recipients = $session[$key]->toArray();
+            }
+            return iwitness_render_view(
+                'gift/congratulation',
+                function () use ($recipients) {
+                    if (count($recipients) <= 0) {
+                        throw new \Exception('Page Not Found', 404);
+                    }
+                    return true;
+                },
+                function () use ($recipients) {
+                    return $recipients;
+                }
+            );
+        }
+
+        /**
+         * @param bool $binding_default_login_user
+         * @param bool $binding_nonce
+         * @return array
+         */
+        private static function get_default_payment_info($binding_default_login_user = false, $binding_nonce = false)
+        {
+
+            $view_model = array(
+                'originalPhoneModel' => '',
+                'plan' => '',
+                'cardType' => '',
+                'cardNum' => '',
+                'expMonth' => '',
+                'expYear' => '',
+                'cardCode' => '',
+                'firstName' => '',
+                'lastName' => '',
+                'address1' => '',
+                'address2' => '',
+                'city' => '',
+                'state' => '',
+                'zip' => '',
+                'country' => '',
+                'originalPhone' => '',
+                'promoCode' => '',
+                'iwitness_renew_nonce' => ''
+            );
+
+            if ($binding_default_login_user) {
+                $api_user = iwitness_get_current_api_user(false);
+                if ($api_user) {
+                    $view_model['originalPhone'] = $api_user->phone;
+                    $view_model['firstName'] = $api_user->firstName;
+                    $view_model['lastName'] = $api_user->lastName;
+                    $view_model['address1'] = $api_user->address1;
+                    $view_model['address2'] = $api_user->address2;
+                    $view_model['city'] = $api_user->city;
+                    $view_model['state'] = $api_user->state;
+                    $view_model['zip'] = $api_user->zip;
+
+                    if ($binding_nonce) {
+                        //setup nonce
+                        $session = iWitness()->session();
+                        $nonce = sha1(uniqid(md5(srand()), true));
+                        $view_model['iwitness_renew_nonce'] = $nonce;
+                        $session['iwitness_renew_nonce'] = $nonce;
+                    }
+                }
+            }
+            return $view_model;
+        }
+
+    }
+
+endif;
+
+new iWitness_Purchase_Shortcodes();

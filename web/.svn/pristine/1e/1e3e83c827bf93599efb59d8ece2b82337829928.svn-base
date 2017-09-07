@@ -1,0 +1,1495 @@
+#order form {
+  margin: 0
+}
+
+#order .error {
+  color: #c62c21
+}
+
+#claim-code .error {
+  color: #c62c21
+}
+
+#order .step {
+  position: relative;
+  padding-left: 5px
+}
+
+#order .step2, #order .step3 {
+  margin-top: 30px;
+  position: relative
+}
+
+#order .step3 .infobox {
+  box-shadow: 0 5px 5px 3px #333;
+  -moz-box-shadow: 0 5px 5px 3px #333;
+  -webkit-box-shadow: 0 5px 5px 3px #333;
+  border-radius: 10px;
+  -moz-border-radius: 10px;
+  -webkit-border-radius: 10px;
+  position: absolute;
+  bottom: 50px;
+  right: -30px;
+  width: 275px;
+  padding: 10px;
+  color: black;
+  background-color: #c9c9c9;
+  font-weight: bold
+}
+
+#order .step .pointer {
+  position: absolute;
+  top: -15px;
+  left: -135px;
+  background: url("../../images/start-now/step.png") no-repeat;
+  width: 134px;
+  height: 52px;
+  text-align: center;
+  text-indent: -20px;
+  line-height: 52px;
+  font-size: 20px;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: #fff
+}
+
+#order .inner h2 {
+  color: #fff;
+  font-size: 18px;
+  font-weight: bold;
+  text-transform: uppercase;
+  margin-bottom: 10px
+}
+
+#order .smartphones {
+  position: relative;
+  background: url("../../images/start-now/phones.jpg") no-repeat center bottom;
+  width: 604px;
+  height: 278px
+}
+
+#order .smartphones .smartphone {
+  height: 244px;
+  float: left;
+  text-align: center
+}
+
+#order .smartphones .iphone4 {
+  width: 160px
+}
+
+#order .smartphones .iphone3 {
+  width: 125px;
+  position: relative
+}
+
+#order .smartphones .android {
+  width: 143px;
+  margin-left: 10px
+}
+
+#order .smartphones .windows7 {
+  width: 139px;
+  margin-left: 10px
+}
+
+#order .smartphones .smartphone h4 {
+  font-size: 13px;
+  height: 230px
+}
+
+#order .smartphones .smartphone label {
+  display: block;
+  cursor: pointer
+}
+
+#claim-code .smartphones {
+  position: relative;
+  background: url("../../images/start-now/phones.jpg") no-repeat center bottom;
+  width: 604px;
+  height: 278px
+}
+
+#claim-code .smartphones .smartphone {
+  height: 244px;
+  float: left;
+  text-align: center
+}
+
+#claim-code .smartphones .iphone4 {
+  width: 160px
+}
+
+#claim-code .smartphones .iphone3 {
+  width: 125px;
+  position: relative
+}
+
+#claim-code .smartphones .android {
+  width: 143px;
+  margin-left: 10px
+}
+
+#claim-code .smartphones .windows7 {
+  width: 139px;
+  margin-left: 10px
+}
+
+#claim-code .smartphones .smartphone h4 {
+  font-size: 13px;
+  height: 230px
+}
+
+#claim-code .smartphones .smartphone label {
+  display: block;
+  cursor: pointer
+}
+
+#order .plans {
+  margin-top: 20px;
+  padding-bottom: 5px;
+  margin-left: 45px
+}
+
+#order .plans li {
+  margin-bottom: 16px;
+  list-style-type: none
+}
+
+#order .plans li input {
+  margin: 0 0 10px 0
+}
+
+#order .plans li label {
+  margin: 0
+}
+
+#order .plans li .price {
+  display: inline-block;
+  width: 80px;
+  line-height: 23px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #c62c21;
+  padding: 0px 4px
+}
+
+#order .plans li .details {
+  display: inline-block;
+  font-size: 15px;
+  font-weight: bold;
+  padding: 3px 5px;
+  width: 250px;
+  text-transform: uppercase;
+  border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px
+}
+
+#order .plans li .monthly {
+  background-color: #777;
+  padding: 1px 8px;
+  display: inline-block;
+  text-transform: uppercase;
+  color: white;
+  font-size: 12px;
+  margin-top: 0px
+}
+
+/*#order .payment {
+  padding: 0px 0px 10px 20px
+}*/
+
+#order .payment .card-type label {
+  display: inline;
+  padding: 0px 20px 0px 0px
+}
+
+#order .payment input.checkbox {
+  border: none;
+  margin: 0 0 2px
+}
+
+#order .payment .row {
+  margin: 5px 0px 10px 0px
+}
+
+#order .payment input,
+#order .payment select {
+  border-radius: 5px;
+  border: 1px solid #fff;
+  padding: 4px
+}
+
+#order .payment select {
+  width: 130px
+}
+
+/*#order .payment .ccard-icon {
+  position: absolute;
+  display: inline-block;
+  background: url("../../images/start-now/ccard.gif") no-repeat;
+  width: 40px;
+  height: 26px;
+  margin-left: 135px;
+  margin-top: 3px
+}*/
+
+/*#order .payment .secure {
+  width: 280px;
+  padding: 2px;
+  background: #a6a6a6;
+  margin-bottom: 30px;
+  border-radius: 3px;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  text-align: center;
+  color: #000;
+  font-size: 12px
+}*/
+
+#order .payment h4 {
+  font-size: 16px;
+  font-weight: bold;
+  text-transform: uppercase
+}
+
+#order .payment h6 {
+  text-transform: uppercase
+}
+
+#order .payment ul {
+  margin-left: 0
+}
+
+#order .payment ul li {
+  list-style-type: none
+}
+
+#order .payment .column {
+  float: left;
+  margin-right: 20px
+}
+
+#order .payment .wireless-phone {
+  margin-bottom: 2px
+}
+
+#order .payment .hint {
+  font-weight: normal;
+  font-style: italic;
+  padding: 4px
+}
+
+#order .payment .long {
+  width: 350px
+}
+
+#order .payment .half {
+  width: 160px
+}
+
+#order .submit {
+  position: relative
+}
+
+/*#order .submit div {
+  padding: 4px 6px;
+  background: #777;
+  color: white;
+  width: 410px;
+  margin-bottom: 30px;
+  font-size: 12px
+}*/
+
+#order .submit .btn {
+  position: absolute;
+  top: -7px;
+  left: 370px;
+  cursor: pointer;
+  width: 115px;
+  height: 56px;
+  border: none;
+  border-radius: 10px;
+  -moz-border-radius: 10px;
+  -webkit-border-radius: 10px;
+  font-size: 20px;
+  text-transform: uppercase
+}
+
+#order .submit .btn .icon-white {
+  position: relative;
+  top: 5px
+}
+
+#order .notice .highlight {
+  font-size: 32px;
+  font-weight: bold;
+  color: #c62c21;
+  position: absolute;
+  text-indent: -15px
+}
+
+#order .notice {
+  line-height: 30px;
+  text-align: left;
+  text-indent: 20px;
+  margin-bottom: 30px
+}
+
+#order .items {
+  width: 100%;
+  margin-bottom: 40px;
+  border-collapse: collapse
+}
+
+#order .items th {
+  padding: 2px 5px;
+  text-align: right;
+  border-right: none;
+  border-left: none
+}
+
+#order .items th.first {
+  border-left: 1px solid #c62c21
+}
+
+#order .items th.last {
+  border-right: 1px solid #c62c21
+}
+
+#order .items td {
+  padding: 5px 0px 5px 5px;
+  vertical-align: top;
+  text-align: right
+}
+
+#order .items td .vruler {
+  border-right: 1px solid #c62c21;
+  width: 1px;
+  margin-left: 5px;
+  height: 90px;
+  float: right
+}
+
+#order .items .first {
+  text-align: left
+}
+
+#order .billing {
+  margin-bottom: 10px
+}
+
+#order .billing h4 {
+  color: #c62c21;
+  border-bottom: 1px solid #c62c21;
+  font-weight: bold;
+  margin-bottom: 10px
+}
+
+#order .billing h4 span {
+  color: #777
+}
+
+#order.review .body {
+  padding-right: 160px
+}
+
+#order.review p.hint {
+  font-size: 10px;
+  line-height: 10px
+}
+
+#order .actions {
+  width: 100%;
+  height: 50px;
+  text-align: center
+}
+
+#order .actions .last {
+  text-align: right;
+  padding-right: 10px
+}
+
+#order .actions .back {
+  border: 1px solid #878a8e;
+  background: #616365;
+  padding: 1px;
+  text-decoration: none
+}
+
+#order .actions .back span {
+  background: #878a8e;
+  padding: 0px 8px;
+  text-transform: uppercase;
+  color: white
+}
+
+#order .actions button {
+  width: 222px;
+  margin-top: 0
+}
+
+#order .promo-code {
+  width: 325px
+}
+
+#order .use-promo-code .status-bar {
+  width: 287px
+}
+
+#order .use-promo-code .payment {
+  padding: 0;
+  margin-bottom: 20px
+}
+
+#order #iphone3-warning-overlay {
+  position: absolute;
+  padding: 6px;
+  background-color: #df1c18;
+  color: #fff;
+  line-height: 16px;
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  width: 255px;
+  top: 69px;
+  left: -47px;
+  display: none
+}
+
+#claim-code #iphone3-warning-overlay {
+  position: absolute;
+  padding: 6px;
+  background-color: #df1c18;
+  color: #fff;
+  line-height: 16px;
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  width: 255px;
+  top: 69px;
+  left: -47px;
+  display: none
+}
+
+#order .outline {
+  border: 1px solid #c62c21;
+  padding: 2px 5px
+}
+
+#order .outline.dark {
+  background-color: #dcdcdc
+}
+
+/*.member .pagination {
+  clear: both
+}
+
+.member #profile .head h2 {
+  position: relative;
+  top: 15px;
+  left: 100px
+}
+
+.member #profile th {
+  font-weight: normal
+}
+
+.member #profile .btn {
+  padding-left: 10px;
+  padding-right: 10px
+}
+
+.member #profile .photo .btn {
+  margin-bottom: 10px;
+  font-size: 12px;
+  width: 180px
+}
+
+.member #profile .column1 {
+  float: left;
+  width: 320px
+}
+
+.member #profile .column2 {
+  float: left;
+  width: 500px;
+  margin-left: 10px
+}
+
+.member #profile .photo {
+  margin-left: 80px
+}
+
+.member #profile .photo #profile-photo {
+  background-color: #ee9b00;
+  border: 1px solid #bdbebf;
+  border-radius: 12px;
+  -moz-border-radius: 12px;
+  -pie-border-radius: 12px;
+  -webkit-border-radius: 12px;
+  box-shadow: #333 3px 3px 3px;
+  -webkit-box-shadow: #333 3px 3px 3px;
+  -moz-box-shadow: #333 3px 3px 3px;
+  -pie-box-shadow: #333 3px 3px 3px;
+  width: 200px;
+  margin-bottom: 10px
+}
+
+.member #profile .alert {
+  margin: 10px 0px 0px 0px
+}
+
+.member #profile .contacts {
+  float: left;
+  width: 50%
+}
+
+.member #profile th, .member #profile dt {
+  color: #f09c00
+}
+
+.member #profile dd {
+  margin-left: 60px;
+  margin-bottom: 20px
+}
+
+.member #profile .alert {
+  background: #af292e;
+  border: 1px solid #fff;
+  border-radius: 12px;
+  -moz-border-radius: 12px;
+  -pie-border-radius: 12px;
+  -webkit-border-radius: 12px;
+  box-shadow: #333 5px 5px 5px;
+  -webkit-box-shadow: #333 5px 5px 5px;
+  -moz-box-shadow: #333 5px 5px 5px;
+  -pie-box-shadow: #333 5px 5px 5px;
+  width: 295px;
+  height: 230px;
+  font-size: 11px;
+  line-height: 130%
+}
+
+.member #profile .alert .missing-contacts {
+  line-height: 110%
+}
+
+.member #profile .alert .header {
+  background: url("/images/alert.png") 15px 10px no-repeat;
+  padding: 8px 10px 10px 80px
+}
+
+.member #profile .alert .note {
+  margin-left: 15px
+}
+
+.member #profile .alert ul {
+  margin-left: 20px
+}
+
+.member #profile form {
+  width: 75%
+}
+
+.member #profile input.text, .member #profile textarea {
+  background-color: white;
+  border: 1px solid #545454;
+  padding: 3px 3px;
+  width: 100%
+}
+
+.member #profile select {
+  width: 100%;
+  margin: 0;
+  padding: 3px
+}
+
+.member #profile .submit {
+  margin-top: 10px
+}
+
+.member #profile form td {
+  padding-right: 20px;
+  vertical-align: top
+}
+
+.member #profile form td:last-child {
+  padding: 0
+}
+
+.member #profile label {
+  position: relative;
+  margin: 1px 0px 4px
+}
+
+.member #profile #dist_feature {
+  height: 40px
+}
+
+.member #profile span.required {
+  float: left;
+  font-size: 28px;
+  position: absolute;
+  left: -17px;
+  top: 5px;
+  color: #ee9b00
+}
+
+.member #profile .incomplete-alert {
+  font-size: 16px;
+  font-weight: bold;
+  margin-left: -10px;
+  margin-top: -3px;
+  position: absolute;
+  color: #ee9b00
+}
+
+.member #profile .alert li {
+  margin-bottom: 3px
+}
+
+.member #profile .status-accepted-icon {
+  color: #f09c00
+}
+
+.member #profile .status-declined-icon {
+  color: #af292e
+}
+
+.member #profile .view-contacts {
+  color: #f09c00
+}
+
+.member #profile .status-bar {
+  margin-left: 100px;
+  width: 610px;
+  text-align: center
+}
+
+.member #profile .change form {
+  width: 300px
+}
+
+.member #profile .change .inner {
+  padding-left: 100px
+}
+
+.member #profile .change form h4 {
+  background: #df1c17;
+  margin: 0;
+  padding: 5px 20px;
+  font-weight: bold;
+  color: white
+}
+
+.member #profile .change form input, .member #profile .change form label, .member #profile .change .validate-error {
+  margin-left: 20px;
+  width: 260px
+}
+
+.member #profile .change form button {
+  margin: 10px 20px
+}
+
+.member #profile #upload-loader {
+  vertical-align: middle
+}
+
+.member #contacts .page3 .inner {
+  padding-top: 30px
+}
+
+.member #contacts .contact-box a {
+  margin: 0 18px 0 0
+}
+
+.member #contacts .contact-box input {
+  margin: 0;
+  padding: 4px
+}
+
+.member #contacts .add-contact-container {
+  position: relative;
+  height: 24px;
+  margin-bottom: 10px;
+  color: white
+}
+
+.member #contacts .head {
+  position: relative
+}
+
+.member #contacts .head h2 {
+  position: absolute;
+  top: 35px
+}
+
+.member #contacts .head h3.my-contacts {
+  background: url("../../images/contacts/my-contacts.png") 0 0 no-repeat;
+  width: 195px;
+  height: 45px;
+  position: absolute;
+  top: 101px;
+  left: 160px
+}
+
+.member #contacts .add-contact {
+  height: 24px;
+  background: #df1c17;
+  border-radius: 8px;
+  -moz-border-radius: 8px;
+  -webkit-border-radius: 8px;
+  -pie-border-radius: 8px;
+  line-height: 24px;
+  text-align: center;
+  text-transform: uppercase;
+  font-size: 12px;
+  color: white;
+  width: 122px;
+  padding-left: 5px;
+  position: absolute
+}
+
+.member #contacts .add-contact .plus {
+  position: absolute;
+  top: -3px;
+  left: 6px;
+  font-size: 16px;
+}
+
+.member #contacts .contact-box {
+  background: #8b8c8f;
+  border-radius: 12px;
+  color: white;
+  padding: 25px 13px 15px 14px;
+  // width: 240px;
+  white-space: nowrap;
+  float: left;
+  margin-bottom: 15px;
+  margin-right: 20px;
+  overflow: hidden;
+  position: relative
+}
+
+.member #contacts .contact-box.last {
+  margin-right: 0
+}
+
+.member #contacts .list .btn {
+  text-align: center
+}
+
+.member #contacts .list .btn-edit {
+  margin-right: 2px
+}
+
+.member .btn-mini {
+  font-size: 11px;
+  width: 103px;
+  padding-bottom: 6px
+}
+
+.member #contacts .edit .contact-box {
+  padding-left: 30px;
+  padding-right: 30px;
+  width: 195px
+}
+
+.member #contacts .edit .contact-box .number {
+  position: absolute;
+  left: 5px;
+  top: 20px;
+  color: #af292e;
+  font-size: 20px;
+  font-weight: bold
+}
+
+.member #contacts input.text, .member #contacts textarea {
+  border: 1px solid #c7c9cc;
+  background-color: white;
+  width: 100%
+}
+
+.member #contacts select {
+  width: 100%;
+  margin: 0;
+  border: 1px solid #c7c9cc;
+  background-color: #c7c9cc;
+  display: block
+}
+
+.member #contacts label {
+  font-size: 11px;
+  color: #fff
+}
+
+.member #contacts .save-contact {
+  margin-top: 5px
+}
+
+.member #contacts .relationship {
+  margin-bottom: 12px
+}
+
+.member #contacts .submit {
+  margin-left: -5px;
+  margin-top: 5px
+}
+
+.member #contacts .is-primary {
+  position: absolute;
+  color: #f09c00;
+  margin-top: -15px;
+  font-weight: bold;
+  font-size: 11px
+}
+
+.member #contacts .contact-list .contact-box-inner {
+  padding: 20px 0px 0px 20px
+}
+
+.member #contacts .contact-box h4 {
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: 16px;
+  position: relative
+}
+
+.member #contacts .status {
+  float: right;
+  width: 60px;
+  margin: 0px auto;
+  font-size: 11px;
+  line-height: 12px;
+  text-align: center;
+  text-transform: uppercase;
+  position: absolute;
+  right: 0px;
+  top: 5px
+}
+
+.member #contacts .status-flag {
+  margin-left: 16px;
+  width: 26px;
+  height: 26px;
+  background: url("../../images/contacts/statuses.png") no-repeat;
+  border-radius: 2px;
+  -moz-border-radius: 2px;
+  -webkit-border-radius: 2px
+}
+
+.member #contacts .status-flag-accepted {
+  background-position: 0px 0px
+}
+
+.member #contacts .status-flag-pending {
+  background-position: -26px 0px
+}
+
+.member #contacts .status-flag-declined {
+  background-position: -52px 0px
+}
+
+.member #events .inner .sidebar {
+  float: left;
+  width: 245px;
+  height: 492px;
+  margin: 0px 0px 0px 15px;
+  padding: 0px 30px;
+  position: relative
+}
+
+.member #events .inner .sidebar h2 {
+  position: absolute;
+  top: -40px;
+  font-size: 1.3em;
+  font-weight: bold;
+  white-space: nowrap;
+  color: #000
+}
+
+.member #events .inner .sidebar .help {
+  margin-top: 40px;
+  padding: 0px 15px;
+  font-weight: bold
+}
+
+.member #events .inner .sidebar .help h4 {
+  font-size: 18px;
+  font-weight: bold;
+  text-transform: uppercase;
+  margin-bottom: 15px;
+  white-space: nowrap;
+  overflow: hidden
+}
+
+.member #events .inner .sidebar .never {
+  font-size: 15px;
+  margin: 50px 0px;
+  padding: 0px 15px;
+  font-weight: bold;
+  color: #000;
+  text-transform: uppercase
+}
+
+.member #events .inner .main {
+  margin-left: 350px;
+  margin-right: 10px;
+  padding: 0px 10px
+}
+
+.member #events h3.latest-events {
+  position: relative;
+  margin: 0 auto;
+  left: 180px;
+  top: 20px
+}
+
+.member #events h3.latest-events a {
+  letter-spacing: 4px
+}
+
+.member #events .event-list {
+  margin-left: 5px
+}
+
+.member #events .event-box {
+  float: left;
+  margin: 0px 50px 25px 0px
+}
+
+.member #events .event-box.last {
+  margin-right: 0
+}
+
+.member #events .event-box img {
+  width: 150px;
+  border-radius: 7px;
+  -moz-border-radius: 7px;
+  -webkit-border-radius: 7px
+}
+
+.member #events .event-box .image {
+  height: 108px;
+  overflow: hidden
+}
+
+.member #events .timezone a {
+  text-decoration: underline
+}
+
+.member #events .view .head h3.event-detail {
+  background: url("../../images/contacts/my-contacts.png") 0 0 no-repeat;
+  width: 195px;
+  height: 45px;
+  position: absolute;
+  top: 78px;
+  left: 240px
+}
+
+.member #events .view input.text {
+  width: 390px;
+  padding: 3px;
+  margin-bottom: 10px
+}
+
+.member #events .view .event-box {
+  width: 400px;
+  margin-right: 40px
+}
+
+.member #events .view .map-box {
+  float: left;
+  margin: 0px 0 13px;
+  color: #777
+}
+
+.member #events .view .no-coords {
+  border: 1px solid #f09c00;
+  width: 400px;
+  height: 450px;
+  line-height: 400px;
+  text-align: center;
+  color: #fff;
+  font-size: 16px;
+  font-weight: bold
+}
+
+.member #events .view .no-asset {
+  border: 1px solid #f09c00;
+  width: 400px;
+  padding: 100px 0px;
+  text-align: center;
+  color: #fff;
+  font-size: 16px;
+  font-weight: bold;
+  background-color: #777
+}
+
+.member #events #mediaplayer {
+  margin-bottom: 5px
+}
+
+.member #events .view .buttons {
+  margin-top: 5px
+}
+
+.member #content #map-canvas {
+  color: #000
+}*/
+
+.stepcarousel {
+  position: relative;
+  border: 10px solid transparent;
+  overflow: scroll;
+  height: 493px;
+  width: 822px
+}
+
+.stepcarousel .belt {
+  position: absolute;
+  left: 0;
+  top: 0
+}
+
+.stepcarousel .panel {
+  float: left;
+  overflow: hidden;
+  margin: 0px;
+  width: 822px
+}
+
+.paginate {
+  width: 250px;
+  padding: 20px
+}
+
+#order .plans .seattle_title_new {
+  font-size: 23px;
+  font-family: Arial;
+  font-weight: bold;
+  color: #77787b;
+  margin-bottom: 20px;
+}
+
+.normally {
+  font-size: 16px;
+  font-family: Arial;
+  color: #77787b
+}
+
+.details_new {
+  border-radius: 3px 3px 3px 3px;
+  color: #77787b;
+  display: inline-block;
+  font-size: 22px;
+  padding: 3px 22px; /*    text-transform: uppercase;*/
+  width: 515px;
+}
+
+.perMonth_new {
+  padding: 0 0 0 125px;
+  color: #C62C21;
+  font-size: 16px;
+}
+
+.Note_new {
+  padding: 0 0 10px 25px;
+  font-size: 15px;
+  font-family: Arial;
+  font-weight: regular;
+  color: #77787b
+}
+
+.condition {
+  font-size: 11.5px;
+  font-family: Arial;
+  font-weight: Regular;
+  color: #77787b;
+  padding: 0 0 0 100px;
+}
+
+#order .plans li #promoCode {
+  width: 336px;
+  height: 22px;
+  border: 1px solid #858585;
+  margin-bottom: 5px;
+  border-radius: 0px;
+}
+
+.seattle_logo {
+  background: url("../../images/start-now/seatte_logo.png") no-repeat scroll center bottom transparent;
+  height: 53px;
+  position: relative;
+  width: 105px;
+  padding: 0 0 0px 325px;
+  margin: 0 0 10px 0;
+  text-align: center;
+}
+
+#order .plans li #price {
+  font-size: 28px;
+}
+
+/* Add receipeint info */
+
+.outer_wrraper {
+
+}
+
+.subscription {
+  padding: 0px 10px 0 0px;
+  overflow: hidden;
+  font-size: 16px;
+  line-height: 22px;
+}
+
+.gift_subscription {
+  width: 50%;
+  float: left;
+
+}
+
+.gift_image {
+  width: 176px;
+  float: left;
+}
+
+.blank_div {
+  margin: 20px 0;
+  border-top: 1px solid #dadada;
+  clear: both;
+}
+
+.rec_container {
+  padding: 0px 10px 0px 0px;
+  font-size: 16px;
+  overflow: hidden;
+}
+
+.sender_container {
+  width: 300px;
+  float: left;
+  padding: 5px 0px 10px 0px;
+}
+
+.sender_container input {
+  width: 265px;
+}
+
+.peresonalMessage {
+  width: 450px;
+  float: left;
+  padding: 5px 0px 10px 0px;
+}
+
+.peresonalMessage textarea {
+  width: 432px;
+  height: 183px;
+}
+
+.dateContainer {
+  width: 290px;
+}
+
+.datePicker {
+  width: 30px;
+  height: 26px;
+  float: right;
+  padding-top: 1px;
+}
+
+.btnWidth {
+  width: auto;
+  margin-bottom: 20px;
+}
+
+.msg {
+  font-size: 14px;
+  float: right;
+}
+
+.rec_container span {
+  color: #c62c21;
+}
+
+.BlankDiv {
+  height: 15px;
+}
+
+/* gift card step 1 & 2 */
+
+.btnWidth {
+  width: auto;
+  margin-bottom: 20px;
+}
+
+.delivered {
+  width: 125px;
+  height: 27px;
+  background-color: #77787b;
+  line-height: 27px;
+  color: #FFF;
+  text-align: center;
+  margin-left: 210px;
+  margin-top: -25px;
+  margin-bottom: 20px;
+}
+
+.oneyear {
+  /* width:366px;*/
+  width: 707px;
+  overflow: hidden;
+  margin-left: 85px;
+  font-size: 16px;
+}
+
+.rowContainer {
+  width: 100%;
+  overflow: hidden;
+}
+
+.title {
+  /* width:111px;*/
+  width: 275px;
+  float: left;
+}
+
+.border {
+  height: 1px;
+  width: 100%;
+  clear: both;
+  background-color: #77787b;
+}
+
+.edit {
+  width: 40px;
+  line-height: 35px;
+  float: right;
+  text-decoration: underline;
+}
+
+.remove {
+  width: 60px;
+  line-height: 35px;
+  float: right;
+  text-decoration: underline;
+}
+
+.total {
+  font-size: 30px;
+  font-weight: bold;
+  color: #c62c21;
+  float: right;
+  width: 111px;
+  line-height: 35px;
+}
+
+.addAnotherBtn {
+  height: 15px;
+  float: right;
+  line-height: 14px;
+}
+
+.congoText {
+  width: 600px;
+  font-size: 20px;
+  color: #000;
+  line-height: 30px;
+  margin: 50px 0px 0px 20px;
+  font-weight: bold;
+}
+
+.textContainer {
+  text-decoration: underline;
+  font-size: 16px;
+  margin: 70px 0px 0px 20px;
+}
+
+.bd2 {
+  background-color: #fff;
+  padding-top: 1px;
+  min-height: 530px
+}
+
+.border2 {
+  width: 100%;
+  height: 40px;
+  background-color: #77787b;
+  margin: 20px 0px;
+}
+
+/*line below mobile iamge on index*/
+.mobileline {
+  width: 231px;
+  font-size: 15px;
+  font-weight: bold;
+  clear: both;
+  padding-left: 5px;
+}
+
+/* mailer css start*/
+
+.bg {
+  background-color: #fff;
+}
+
+.mailerContainer {
+  width: 600px;
+  background-color: #fff;
+  color: #000;
+  /*	margin:0 auto;*/
+}
+
+.mailerHeader {
+  width: 540px;
+  padding: 20px 30px;
+  height: 70px;
+  border-bottom: 1px solid #000;
+}
+
+.mailerHeader p {
+  font-size: 16px;
+}
+
+.mailerHeader a {
+  text-decoration: underline;
+}
+
+.mailerlog {
+  width: 600px;
+  padding: 10px 0px;
+  border-bottom: 5px solid #777;
+  overflow: hidden;
+}
+
+.logotext {
+  width: 410px;
+  padding-left: 0px;
+  float: left;
+}
+
+.logotext a {
+  text-decoration: underline;
+}
+
+.mailerimg {
+  width: 600px;
+  height: 302px;
+  background-image: url(../../images/image2.png);
+  background-repeat: no-repeat;
+}
+
+.mailerimg p {
+  padding: 140px 0px 0px 50px;
+  color: #77787b;
+  font-size: 18px;
+  width: 356px;
+  line-height: 23px;
+}
+
+.mailerimg a {
+  text-decoration: underline;
+}
+
+.mailerTo {
+  padding: 20px 0px 0px 50px;
+  font-size: 18px;
+  width: 356px;
+  line-height: 23px;
+}
+
+.mailerTo span {
+  font-size: 13px;
+}
+
+.mailerimg4 {
+  width: 600px;
+  height: 582px;
+  background-image: url(../../images/image4.png);
+  background-repeat: no-repeat;
+}
+
+.mailerCommon {
+  width: 570px;
+  overflow: hidden;
+  color: #77787b;
+  padding-left: 30px;
+}
+
+.mailerimg3 {
+  width: 600px;
+  height: 296px;
+  background-image: url(../../images/image3.png);
+  background-repeat: no-repeat;
+}
+
+.mailerText2 {
+  width: 330px;
+  height: 270px;
+  padding: 10px 0px 0px 20px;
+  float: left;
+  background-color: #FFF;
+}
+
+.mailerText3 {
+  width: 215px;
+  height: 270px;
+  /*	padding:10px 0px 0px 30px;*/
+  float: right;
+  margin: 10px auto;
+}
+
+.mailerBtn {
+  width: 168px;
+  height: 33px;
+  font-size: 22px;
+  margin: 80px 5px 0 0;
+  font-weight: bold;
+  color: white;
+  text-shadow: none;
+  line-height: 33px;
+}
+
+.mailerClaim {
+  width: 152px;
+  font-size: 17px;
+  margin-top: 5px;
+  margin-left: 15px;
+  padding-bottom: 5px;
+}
+
+.mailerClaim span {
+  color: #d7312d;
+  line-height: 17px;
+
+}
+
+.mailerlink {
+  width: 196px;
+  font-size: 11px;
+  /*	color:#092ecf;
+      margin-top:59px;
+      margin-left:120px;
+      text-decoration:underline;*/
+  border-top: 1px solid #000;
+  padding-top: 5px;
+}
+
+.mailerlink span {
+  color: #092ecf;
+
+}
+
+.mobileline {
+  width: 231px;
+  font-size: 15px;
+  font-weight: bold;
+  clear: both;
+  padding-left: 5px;
+}
+
+.sample {
+}

@@ -1,0 +1,87 @@
+<?php
+    $users = isset($view_model['users']) ? $view_model['users'] : array();
+    $page_info = isset($view_model['page_info']) ? $view_model['page_info'] : array();
+?>
+
+<?php do_action('iwitness_print_notices'); ?>
+
+<h2>Manage User</h2>
+<hr>
+
+<div id="delete-user-container">
+
+    <form role="form" method="POST" data-validate="true">
+        <div class="form-horizontal">
+            <div class="form-group">
+
+                <label class="col-md-3 label-control" for="phone-number">Enter Phone Number:</label>
+
+                <div class="col-md-3">
+                    <input id="phone-number" name="phone-number" type="text" class="form-control"
+                           value="<?php echo isset($view_model['phone_number']) ?  $view_model['phone_number'] : '' ; ?>" />
+                </div>
+
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-primary" id="search-user" name="action" value="admin_delete_user">Search</button>
+                </div>
+
+            </div>
+        </div>
+    </form>
+
+    <?php if(!empty($users) && count($users) > 0): ?>
+
+        <div class="table-responsive">
+            <table id="user-table" class="table table-bordered table-striped table-hover">
+                <thead>
+                    <tr class="bg-grey">
+                        <th class="text-center">No</th>
+                        <th>Phone</th>
+                        <th>Email</th>
+                        <th>First name</th>
+                        <th>Last name</th>
+                        <th>&nbsp;</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach($users as $index => $user): ?>
+                    <tr>
+                        <td class="text-center"><?php echo $index + 1; ?></td>
+                        <td><?php echo $user['phone']; ?></td>
+                        <td><?php echo $user['email']; ?></td>
+                        <td><?php echo $user['firstName']; ?></td>
+                        <td><?php echo $user['lastName']; ?></td>
+                        <td class="text-center" style="width: 18%;">
+                            <form method="post" action="">
+                                <input type="hidden" name="user_id" id="user_id" value="<?php echo $user['id']; ?>" >
+                                <input type="hidden" name="action" id="action" value="" >
+
+                                <button type="submit"
+                                        value="suspend" class="btn btn-warning btn-xs"><?php echo $user['suspended'] == 1 ? 'UnSuspend':'Suspend'  ?></button>
+                                <button type="submit"
+                                        value="delete" class="btn btn-primary btn-xs">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="6">
+                            <?php iwitness_pager($page_info, iwitness_get_page_path(IWITNESS_PAGE_ADMIN_DELETE_USER_ID)); ?>
+
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+
+        </div>
+
+    <?php endif; ?>
+</div>
+
+
+<?php
+// lazy loading style and script
+wp_print_scripts('iwitness-user-manage-plugin');
+?>

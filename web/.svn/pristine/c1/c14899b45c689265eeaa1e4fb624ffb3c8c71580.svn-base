@@ -1,0 +1,130 @@
+<?php
+
+
+/**
+ * @param $login
+ * @param $password
+ * @return null | iWitness_Access_Token
+ */
+function iwitness_get_access_token($login, $password)
+{
+    iwitness_log_debug('Begin to get token for ' . $login);
+
+    /** @var iWitness $iWitness */
+    $iWitness = iWitness();
+    $url = $iWitness->api_uri('/oauth');
+
+    $response = iwitness_api_post($url, array(
+            'headers' => array('Content-Type' => 'application/json'),
+            'body' => array(
+                'grant_type' => 'password',
+                'client_id' => IWITNESS_API_CLIENT_ID,
+                'client_secret' => IWITNESS_API_CLIENT_SECRET,
+                'username' => $login,
+                'password' => $password
+            )
+        )
+    );
+
+    iwitness_log_debug('End of get token for ' . $login);
+    return new iWitness_Access_Token($response);
+}
+
+/**
+ * @param iWitness_Access_Token $token
+ * @param null | string $login
+ * @return array|iWitness_Api_Exception|iWitness_User
+ * @throws Exception
+ */
+function iwitness_get_api_user(iWitness_Access_Token $token, $login = null)
+{
+    /** @var iWitness $iWitness */
+    $iWitness = iWitness();
+
+    if (empty($login)) {
+        if (empty($token->user_id)) throw new \Exception('Login name could not be null');
+        $url = $iWitness->api_uri('/user/' . $token->user_id);
+    } else {
+        $url = $iWitness->api_uri('/user?' . http_build_query(array('phone' => $login)));
+    }
+
+    $headers = array_merge(array('Content-Type' => 'application/json'), $token->get_bearer());
+    $response = iwitness_api_get($url, array('headers' => $headers));
+
+    $user = new iWitness_User($response);
+
+    //todo: should remove this when api stable
+    if (empty($login)) {
+        if ($user->id != $token->user_id) {
+            throw new Exception('Something wrong with user return from api. Return user doesn\'t match with request one ' . $user->id . ', ' . $token->user_id);
+        }
+    } else {
+        if (!($user->phone == $login || $user->phone == ('1' . $login))) {
+            throw new Exception('Something wrong with user return from api. Return user doesn\'t match with request one ' . $user->phone . ', ' . $token);
+        }
+    }
+
+    return $user;
+
+}
+
+
+/**
+ * @param $login phone in API case
+ * @param $password
+ * @return iWitness_Access_Token|iWitness_Error
+ */
+function iwitness_authenticate_user($login, $password)
+{
+    $token = iwitness_get_access_token($login, $password);
+    return $token;
+}
+
+
+/**
+ * @param iWitness_Access_Token $token
+ */
+function iwitness_refresh_access_token(iWitness_Access_Token $token)
+{
+    /** @var WP_User $user */
+    global $user; // if we call wp_get_current_user(), it always get empty object
+    iwitness_log_debug('Begin to refresh token for user ' . $token->user_id);
+    iwitness_log_debug('old token ' . $token->access_token);
+
+    /** @var iWitness $iWitness */
+    $iWitness = iWitness();
+    $url = $iWitness->api_uri('/oauth');
+
+    $args = array();
+    $args['method'] = 'POST';
+    $args['headers']['Content-Type'] = 'application/json';
+    $args['body'] = json_encode(array(
+        'grant_type' => 'refresh_token',
+        'client_id' => IWITNESS_API_CLIENT_ID,
+        'client_secret' => IWITNESS_API_CLIENT_SECRET,
+        'refresh_token' => $token->refresh_token
+    ));
+
+    $wp_http = iwitness_http_get_object();
+    $response = $wp_http->request($url, $args);
+
+    $data = iwitness_validate_response($response);
+    $newToken = new iWitness_Access_Token($data);
+    $newToken->user_id = $token->user_id;
+    $newToken->refresh_token = $token->refresh_token;
+
+    if ($user) {
+        //update database
+        update_user_meta($user->ID, $iWitness->user_meta_api_token(), $newToken->serialize());
+
+        //clear cache
+        $id = ($user instanceof WP_User) ? $user->ID : $user;
+        $key = IWITNESS_CURRENT_USER_ACCESS_TOKEN . '_' . $id;
+        $GLOBALS[$key] = $newToken;
+    }
+    iwitness_log_debug('new  token ' . $newToken->access_token);
+
+    iwitness_log_debug('End of refresh token for user ' . $token->user_id);
+
+    return $newToken;
+}

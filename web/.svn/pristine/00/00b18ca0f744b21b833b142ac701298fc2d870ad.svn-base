@@ -1,0 +1,66 @@
+<?php
+$contacts = $view_model;
+$total_contacts = count($contacts);
+?>
+
+<?php do_action('iwitness_print_notices'); ?>
+
+<h2>Contacts</h2>
+<p class="lead">Who do you want notified in case of an emergency?</p>
+<hr>
+
+<p><a class="btn btn-primary" href="<?php echo iwitness_get_page_path(IWITNESS_PAGE_CONTACT_EDIT_ID); ?>">+ Add Contact</a></p>
+
+<p>
+    Add up to 6 trusted contacts who you would want notified whenever you feel endangered and you
+    engage an iWitness event. We recommend listing all six possible contacts as it increases the
+    chances that someone will notice the alert and respond quickly. Once you add a contact, that
+    person will be notified by email/text and asked to verify their contact status. The status of
+    each contact will appear below and on your profile page.
+</p>
+
+<?php if (!isset($total_contacts) || $total_contacts <= 0) : ?>
+    Start by <a href="<?php echo iwitness_get_page_path(IWITNESS_PAGE_CONTACT_EDIT_ID); ?>">adding your first contact</a>.
+<?php else: ?>
+    <div class="row">
+        <?php foreach ($contacts as $i => $entry):
+            $flags = isset($entry['flags']) ? $entry['flags'] : '&nbsp;';
+            $email = isset($entry['email']) ? $entry['email'] : '&nbsp;';
+            $first_name = isset($entry['firstName']) ? $entry['firstName'] : '&nbsp;';
+            $last_name = isset($entry['lastName']) ? $entry['lastName'] : '&nbsp;';
+            $relation_type = isset($entry['relationType']) ? $entry['relationType'] : '&nbsp;';
+            $phone = isset($entry['phone']) ? $entry['phone'] : '&nbsp;';
+            ?>
+            <?php if (($i) % 3 == 0): ?>
+                </div>
+                <div class="row">
+            <?php endif; ?>
+            <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">
+                            <?php echo $first_name . ' ' . $last_name ?>
+                        </h3>
+                        <span class="label <?php echo intval($flags) == 1 ? 'label-warning' : '' ?> pull-right" style="margin-top: -20px;">Pending</span>
+                    </div>
+                    <div class="panel-body">
+                        <p><strong>RELATION:</strong> <?php echo $relation_type ?></p>
+                        <p><strong>CELL:</strong> <?php echo iwitness_format_phone($phone) ?></p>
+                        <p><strong>EMAIL:</strong> <?php echo $email ?></p>
+                    </div>
+                    <div class="panel-footer">
+                        <form action="" method="POST" role="form">
+                            <input type="hidden" name="id" value="<?= $entry['id'] ?>">
+
+                            <div class="text-center">
+                                <a class="btn btn-primary btn-sx btn-block" href="<?php echo iwitness_get_page_path(IWITNESS_PAGE_CONTACT_EDIT_ID); ?>">EDIT CONTACT</a>
+                                <button type="submit" class="btn btn-primary btn-sx btn-block" name="action" value="iwitness_do_delete_contact">Delete Contact</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+
+<?php endif; ?>

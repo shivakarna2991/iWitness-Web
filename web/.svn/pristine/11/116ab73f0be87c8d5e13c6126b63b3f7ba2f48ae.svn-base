@@ -1,0 +1,27 @@
+<?php $plugin_path = iWitness()->plugin_path(); ?>
+<?php do_action('iwitness_print_notices'); ?>
+
+<div class="row">
+    <div class="col-md-12">
+        <h2>SIGN UP</h2>
+        <p class="lead">Sign up using promo code</p>
+        <hr>
+        <form id="order" action="" method="POST" class="form-horizontal" data-validate="true">
+            <h3>Step 1) Choose your smartphone</h3>
+            <?php include_once($plugin_path . '/templates/partial/choose-smart-phone.php'); ?>
+            <h3>Step 2) Input promo code</h3>
+            <input class="form-control required" name="promo_code"
+                   value="<?= $view_model['promoCode'] ?>"
+                   type="text">
+            <label class="checkbox control-label" for="agree">
+                <input id="agree" name="agree" type="checkbox" value="agree" data-rule-required = "true"  data-msg-required = "You must agree to the terms and conditions to proceed">
+                I agree to the <a href="/user-agreement" target="_blank">iWitness Licensed
+                    Application End User Agreement</a>, Website <a href="/terms-of-use" target="_blank">Terms of Use</a>
+                and <a
+                    href="/terms-of-service" target="_blank">Terms of Service</a><br>
+            </label>
+            <button class="btn btn-primary" type="submit" name="action" value="iwitness_do_use_promo_code">Continue
+            </button>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,79 @@
+<?php do_action('iwitness_print_notices'); ?>
+
+<h2>List User Activity (Events Created)</h2>
+<hr>
+
+<div id="user-event-table-container">
+
+    <div id="columnSelector" class="columnSelector hide">
+        <!-- this div is where the column selector is added -->
+    </div>
+
+    <div class="table-responsive">
+        <div style="margin: 15px;">
+            <form class="form" method="GET" action="#" data-validate="true" role="form">
+
+                <div class="col-md-5 col-sm-5 col-xs-5">
+                    <input type="text" id="select2-user" name="select2-user" class="form-control"/>
+                </div>
+                <button id="search" class="btn btn-primary">Search</button>
+                <button id="popover" type="button" class="btn btn-primary pull-right"
+                        style="margin-right: 15px;">
+                    Columns
+                </button>
+
+            </form>
+
+        </div>
+        <table class="table tablesorter">
+            <thead>
+            <tr>
+                <th class="columnSelector-disable text-center">No.</th>
+                <th class="columnSelector-disable">Display Name</th>
+                <th class="columnSelector-disable">Lat</th>
+                <th class="columnSelector-disable">Long</th>
+                <th class="columnSelector-disable">Processed</th>
+                <th class="columnSelector-false">Image</th>
+            </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
+
+        <div id="no-record" class="alert alert-info hide" role="alert">
+            <div class="text-center">
+                <strong>No record have been found !!!</strong>
+            </div>
+        </div>
+    </div>
+
+    <!-- user template -->
+    <script type="text/html" id="table-row-template">
+        <td data-content="index" class="text-center"></td>
+        <td data-content="displayName"></td>
+        <td data-content="initialLat"></td>
+        <td data-content="initialLong"></td>
+        <td data-content="processed"></td>
+        <td>
+            <a data-href="videoUrl" data-alt="displayName">
+                <img data-src="imageUrl" data-alt="displayName"/>
+            </a>
+        </td>
+    </script>
+</div>
+
+<?php
+// lazy loading style and script
+wp_print_styles('jquery-ui-css');
+wp_print_scripts('jquery-ui');
+wp_print_scripts('jquery-template-script-plugin');
+wp_print_scripts('jquery-table-sorter-script-plugin');
+wp_print_scripts('jquery-table-sorter-pager-script-plugin');
+wp_print_scripts('jquery-table-sorter-widget-script-plugin');
+wp_print_scripts('jquery-table-sorter-col-selector-widget-script-plugin');
+wp_print_styles('select2-css-plugin');
+wp_print_styles('select2-css-bs-plugin');
+wp_print_scripts('select2-plugin');
+wp_print_scripts('iwitness-user-event-report-plugin');
+?>

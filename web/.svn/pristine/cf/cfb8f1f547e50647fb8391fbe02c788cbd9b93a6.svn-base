@@ -1,0 +1,348 @@
+<?php
+
+add_action('wp_ajax_iwitness_admin_get_users', 'iwitness_admin_get_users');
+add_action('wp_ajax_iwitness_do_admin_suspend_user', 'iwitness_do_admin_suspend_user');
+add_action('wp_ajax_iwitness_do_admin_delete_user', 'iwitness_do_admin_delete_user');
+add_action('wp_ajax_iwitness_admin_get_revenue', 'iwitness_admin_get_revenue');
+add_action('wp_ajax_iwitness_admin_get_subscription', 'iwitness_admin_get_subscription');
+add_action('wp_ajax_iwitness_admin_get_user_event', 'iwitness_admin_get_user_event');
+add_action('wp_ajax_iwitness_admin_get_coupon', 'iwitness_admin_get_coupon');
+
+// for other platform
+add_action('wp_ajax_iwitness_do_other_platform', 'iwitness_do_other_platform');
+add_action('wp_ajax_nopriv_iwitness_do_other_platform', 'iwitness_do_other_platform');
+add_action('wp_ajax_get_access_token', 'iwitness_get_access_token_callback');
+
+/**
+ * Handle ajax users report
+ */
+function iwitness_admin_get_users()
+{
+    try {
+        $searchText  = iwitness_get_post_field_value('searchPhrase');
+        $currentPage = iwitness_get_post_field_value('current');
+        $pageSize    = iwitness_get_post_field_value('rowCount');
+        $start_date  = (int)iwitness_get_post_field_value('start_date');
+        $end_date    = (int)iwitness_get_post_field_value('end_date');
+        $sorts       = iwitness_get_post_sort_field_value();
+
+        $params = array(
+            'page' => $currentPage,
+            'size' => $pageSize,
+            'created_search' => $start_date . ',' . $end_date
+        );
+
+        if (!empty($searchText)) {
+            $params['search_phase'] = $searchText;
+        }
+
+        if ($sorts) {
+            $params['sort'] = $sorts;
+        }
+        $query = '/user?' . http_build_query($params);
+
+        $users = iwitness_api_get($query);
+        $result = array(
+            'current'  => intval($currentPage),
+            'rowCount' => $users['page_size'],
+            'total'    => $users['total_items'],
+            'rows'     => $users['_embedded']['user']
+        );
+
+        header("Content-type: application/json");
+        echo json_encode($result);
+    } catch (Exception $ex) {
+        iwitness_log_error($ex);
+    }
+    die;
+}
+
+/**
+ * Handle ajax coupon report
+ */
+function iwitness_admin_get_coupon()
+{
+    try {
+        $searchText = iwitness_get_post_field_value('searchPhrase');
+        $currentPage = iwitness_get_post_field_value('current');
+        $pageSize = iwitness_get_post_field_value('rowCount');
+        $sorts = iwitness_get_post_sort_field_value();
+
+        $params = array(
+            'page' => $currentPage,
+            'size' => $pageSize
+        );
+
+        if (!empty($searchText)) {
+            $params['codeString'] = $searchText;
+            $params['codeStringSearchType'] = 'start with';
+        }
+
+        if ($sorts) {
+            $params['sort'] = $sorts;
+        }
+
+        $query = '/coupon?' . http_build_query($params);
+        $coupons = iwitness_api_get($query);
+        $result = array(
+            'current'  => intval($currentPage),
+            'rowCount' => $coupons['page_size'],
+            'total'    => $coupons['total_items'],
+            'rows'     => $coupons['_embedded']['coupon']
+        );
+
+        header("Content-type: application/json");
+        echo json_encode($result);
+    } catch (Exception $ex) {
+        iwitness_log_error($ex);
+    }
+    die;
+}
+
+/**
+ * Handle ajax user's events request
+ */
+function iwitness_admin_get_user_event()
+{
+    try {
+        $currentPage = iwitness_get_post_field_value('current');
+        $pageSize = iwitness_get_post_field_value('rowCount');
+        $user_id = iwitness_get_post_field_value('user_id');
+
+        if (empty($user_id)) {
+            $user_id = 0;
+        }
+
+        $params = array(
+            'page' => $currentPage,
+            'size' => $pageSize,
+            'sort' => '+created'
+        );
+        $query = '/user/' . $user_id . '/event?' . http_build_query($params);
+
+        $events = iwitness_api_get($query);
+        $result = array(
+            'current' => intval($currentPage),
+            'rowCount' => $events['page_size'],
+            'total' => $events['total_items'],
+            'rows' => $events['_embedded']['event']
+        );
+
+        header("Content-type: application/json");
+        echo json_encode($result);
+    } catch (Exception $ex) {
+        iwitness_log_error($ex);
+    }
+    die;
+}
+
+/**
+ * Handle ajax revenue report request
+ */
+function iwitness_admin_get_revenue()
+{
+    try {
+        $start_date = iwitness_get_post_field_value('start_date');
+        $end_date = iwitness_get_post_field_value('end_date');
+        $query = '/subscription/report/revenue';
+
+        if (!empty($start_date) && !empty($end_date)) {
+            $query = $query . '/' . $start_date . '/' . $end_date;
+        } else {
+            $query = $query . '/0/0';
+        }
+
+        $revenues = iwitness_api_get($query);
+        $result = array(
+            'current' => 1,
+            'rowCount' => count($revenues['details']),
+            'total' => count($revenues['details']),
+            'rows' => $revenues['details']
+        );
+
+        header("Content-type: application/json");
+        echo json_encode($result);
+    } catch (Exception $ex) {
+        iwitness_log_error($ex);
+    }
+    die;
+}
+
+
+/**
+ * Handle ajax subscription report request
+ */
+function iwitness_admin_get_subscription()
+{
+    try {
+        $searchText  = iwitness_get_post_field_value('searchPhrase');
+        $currentPage = iwitness_get_post_field_value('current');
+        $pageSize    = iwitness_get_post_field_value('rowCount');
+        $start_date  = (int)iwitness_get_post_field_value('start_date');
+        $end_date    = (int)iwitness_get_post_field_value('end_date');
+        $sorts       = iwitness_get_post_sort_field_value();
+
+        $params = array(
+            'page' => $currentPage,
+            'size' => $pageSize,
+            'expired_search' => $start_date . ',' . $end_date
+        );
+
+        if (!empty($searchText)) {
+            $params['search_phase'] = $searchText;
+        }
+
+        if ($sorts) {
+            $params['sort'] = $sorts;
+        }
+
+        $query = '/user?'  . http_build_query($params);
+        $users = iwitness_api_get($query);
+        $result = array(
+            'current'  => intval($currentPage),
+            'rowCount' => $users['page_size'],
+            'total'    => $users['total_items'],
+            'rows'     => $users['_embedded']['user']
+        );
+
+        header("Content-type: application/json");
+        echo json_encode($result);
+    } catch (Exception $ex) {
+        iwitness_log_error($ex);
+    }
+    die;
+}
+
+/**
+ * Handle ajax suspend user request
+ */
+function iwitness_do_admin_suspend_user()
+{
+    try {
+        // get data from the form
+        $user_id = iwitness_get_post_field_value('user_id');
+
+        // do validation
+        iwitness_show_empty_error_message($user_id, 'user id');
+
+        $data = array(
+            'id' => $user_id,
+            'suspended' => iWitness_Admin_Form_Handler::SUSPEND
+        );
+
+        $response = iwitness_api_patch('/user/' . $user_id, array('body' => $data));
+        header("Content-type: application/json");
+        echo json_encode($response);
+    } catch (Exception $ex) {
+        iwitness_log_error($ex);
+    }
+    die;
+}
+
+/**
+ * Handle ajax delete user request
+ */
+function iwitness_do_admin_delete_user()
+{
+    try {
+        // get data from the form
+        $user_id = iwitness_get_post_field_value('user_id');
+
+        // do validation
+        iwitness_show_empty_error_message($user_id, 'user id');
+
+        $response = iwitness_api_delete('/user/' . $user_id);
+
+        //then delete user in wordpress
+        $admin_user = wp_get_current_user();
+        $deleted_user = get_user_by('login', $user_id);
+        if ($deleted_user && $admin_user) {
+            wp_delete_user($deleted_user->ID, $admin_user->ID);
+        }
+
+        header("Content-type: application/json");
+        echo json_encode($response);
+    } catch (Exception $ex) {
+        iwitness_log_error($ex);
+    }
+    die;
+}
+
+/**
+ * Save and and update a contact if the
+ * form was submitted through the user contact page.
+ *
+ * @return void
+ */
+function iwitness_do_other_platform()
+{
+    if (!iwitness_validate_submit('iwitness_do_other_platform', false)) {
+        return;
+    }
+
+    // get value from the form
+    $platform = iwitness_get_post_field_value('platform');
+    $email = iwitness_get_post_field_value('email');
+
+    $errors = array();
+    // validate them
+    if (empty($email)) {
+        $errors['email'][] = 'Please enter the email';
+    }
+
+    if (empty($platform)) {
+        $errors['platform'][] = 'Please enter the platform';
+    }
+
+    if (count($errors) > 0) {
+        $result = array('status' => 422, 'message' => 'Validation failed', 'response' => $errors);
+    } else {
+
+        try {
+            $data = array(
+                'email' => $email,
+                'platform' => $platform,
+            );
+
+            $response = iwitness_api_post('/prospect', array('body' => $data));
+
+            $result = array(
+                'status' => 200,
+                'message' => 'Contact has been updated',
+                'response' => $response,
+                'request' => $data
+            );
+        } catch (\Exception $ex) {
+            iwitness_log_error($ex);
+            if ($ex instanceof iWitness_Api_Exception && $ex->getCode() == 422) {
+                $result = array('status' => 422, 'message' => 'Validation failed', 'response' => $ex->get_validation_errors());
+            } else {
+                $result = array('status' => 500, 'message' => $ex->getMessage(), 'response' => '');
+            }
+        }
+    }
+    echo json_encode($result);
+    exit;
+}
+
+/**
+ * Client request refresh token
+ */
+function iwitness_get_access_token_callback()
+{
+    $result = null;
+    try {
+        $token = iwitness_get_current_user_access_token();
+        if ($token) {
+            $token = iwitness_refresh_access_token($token);
+            if ($token) {
+                $result = array('token' => $token->access_token);
+            }
+        }
+    } catch (Exception $ex) {
+        iwitness_log_error($ex);
+        $result = array('status' => 500, 'message' => $ex->getMessage(), 'response' => '');
+    }
+    echo json_encode($result);
+    exit;
+}

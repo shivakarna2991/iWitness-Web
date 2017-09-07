@@ -1,0 +1,53 @@
+.dt-search {
+  .search {
+    position: absolute;
+    display: flex;
+    margin: 0 20px 0 0 !important;
+    vertical-align: middle !important;
+    width: auto !important;
+  }
+}
+
+#delete-user-container {
+  #user-table {
+    td {
+      button {
+        width: 80px;
+        margin-bottom: 5px;
+      }
+    }
+  }
+}
+
+#revenue-table-container {
+  &.dt-search {
+    .search {
+      position: relative !important;
+
+      ul {
+        li {
+          display: inline-block;
+          font-size: 1.5em;
+          margin-right: 30px;
+          text-align: center;
+
+          span {
+            display: block;
+            color: $red;
+            font-weight: 800;
+          }
+        }
+      }
+    }
+  }
+}
+
+#revenue-table-container {
+  &.dt-search {
+    .search {
+      .form-group {
+        margin-top: 15px !important;
+      }
+    }
+  }
+}

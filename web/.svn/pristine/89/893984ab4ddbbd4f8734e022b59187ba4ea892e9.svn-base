@@ -1,0 +1,33 @@
+<?php
+/**
+ * iWitness_Shortcodes class.
+ *
+ * @class       iWitness_Shortcodes
+ * @version     1.0.0
+ * @package     iWitness/Classes
+ * @category    Class
+ * @author      iWitness
+ */
+
+if (!defined('ABSPATH')) exit; // Exit if accessed directly
+if (!class_exists('iWitness_Shortcodes')) :
+
+    class iWitness_Shortcodes
+    {
+        /**
+         * Init shortcodes
+         */
+        public static function init()
+        {
+            include_once('class-iwitness-user-shortcodes.php');
+            include_once('class-iwitness-contact-shortcodes.php');
+            include_once('class-iwitness-event-shortcodes.php');
+            include_once('class-iwitness-purchase-shortcodes.php');
+            include_once('class-iwitness-admin-shortcodes.php');
+            include_once('class-iwitness-report-shortcodes.php');
+            include_once('class-iwitness-control-shortcodes.php');
+            include_once('class-iwitness-friend-shortcodes.php');
+        }
+    }
+
+endif;

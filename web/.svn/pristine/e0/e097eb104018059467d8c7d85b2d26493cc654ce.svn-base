@@ -1,0 +1,56 @@
+;
+(function ($) {
+    "use strict";
+
+    $().ready(function () {
+        Notification.init();
+    });
+
+    var Notification = (function () {
+
+        function init() {
+            $('#select2-user-id').select2({
+                placeholder: "Type a phone number (like 12063992524)",
+                minimumInputLength: 1,
+                multiple: true,
+                ajax: {
+                    url: $.iw.getApiUrl() + '/search/user',
+                    dataType: 'json',
+                    transport: function (params) {
+                        params.beforeSend = function (request) {
+                            request.setRequestHeader('Authorization', 'Bearer ' + $.iw.getAccessToken());
+                        };
+                        return $.ajax(params);
+                    },
+                    data: function (term, page) {
+                        return {
+                            'term': term
+                        };
+                    },
+                    results: function (data, page) {
+                        if (!data.user) {
+                            error('Cannot find out data source for user');
+                        }
+                        var results = $.map(data.user, function (user, index) {
+                            var fullName = user.firstName != null ? user.firstName : '';
+                            fullName += ' ' + (user.lastName != null ? user.lastName : '');
+                            fullName += ' ' + (user.phone != '' ? user.phone : '');
+
+                            return {
+                                id: user.id,
+                                text: fullName
+                            }
+                        });
+                        return {results: results};
+                    },
+                    dropdownCssClass: "bigdrop"
+                }
+            });
+        }
+
+        return {
+            init: init
+        };
+    })();
+
+})(jQuery);

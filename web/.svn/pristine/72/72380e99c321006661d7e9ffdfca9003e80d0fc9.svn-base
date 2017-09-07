@@ -1,0 +1,15 @@
+#user-table-container {
+  .table-responsive {
+    .popover {
+      margin-top: -140px; /* adjust popover position */
+    }
+  }
+}
+
+#user-event-table-container {
+  .table-responsive {
+    .popover {
+      margin-top: -20px; /* adjust popover position */
+    }
+  }
+}

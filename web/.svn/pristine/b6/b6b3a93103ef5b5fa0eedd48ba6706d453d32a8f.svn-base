@@ -1,0 +1,334 @@
+<?php
+/**
+ * iWitness_User_Shortcodes class.
+ *
+ * @class       iWitness_User_Shortcodes
+ * @version     1.0.0
+ * @package     iWitness/Classes
+ * @category    Class
+ * @author      iWitness
+ */
+
+if (!defined('ABSPATH')) exit; // Exit if accessed directly
+if (!class_exists('iWitness_User_Shortcodes')) :
+
+    /**
+     * The iWitness_User_Shortcodes expose some of shortcode as below
+     *  [iwitness_profile_view]
+     *  [iwitness_profile_edit]
+     *  [iwitness_profile_reset-pass]
+     *  [iwitness_profile_change_wireless_number]
+     *  [iwitness_login]
+     *  [iwitness_forgot_password]
+     *  [iwitness_tell_a_friend]
+     *  [iwitness_api_admin_dashboard]
+     *  [iwitness_admin_delete_user]
+     *  [iwitness_renewal_guidance]
+     *
+     */
+    class iWitness_User_Shortcodes
+    {
+        /**
+         * Constructor
+         */
+        public function __construct()
+        {
+            add_shortcode('iwitness_profile_view', array($this, 'profile_view'));
+            add_shortcode('iwitness_profile_edit', array($this, 'profile_edit'));
+            add_shortcode('iwitness_profile_reset_password', array($this, 'profile_reset_password'));
+            add_shortcode('iwitness_profile_change_password', array($this, 'profile_change_password'));
+            add_shortcode('iwitness_profile_change_wireless_number', array($this, 'change_wireless_number'));
+            add_shortcode('iwitness_login', array($this, 'login'));
+            add_shortcode('iwitness_forgot_password', array($this, 'forgot_password'));
+            add_shortcode('iwitness_tell_a_friend', array($this, 'tell_a_friend'));
+            add_shortcode('iwitness_sign_up', array($this, 'sign_up'));
+            add_shortcode('iwitness_help', array($this, 'help'));
+            add_shortcode('iwitness_renewal_guidance', array($this, 'renewal_guidance'));
+        }
+
+        /**
+         * @return string
+         */
+        public static function  sign_up()
+        {
+            $subscription_uuid = self::get_data_from_submit_or_session('subscriptionUuid');
+            $original_phone = self::get_data_from_submit_or_session('originalPhone');
+
+            return iwitness_render_view(
+                function () use ($subscription_uuid) {
+                    //check valid
+                    if (empty($subscription_uuid)) {
+                        throw new Exception('Unauthorized');
+                    }
+                    return 'profile/sign-up';
+                },
+                function () {
+                    return (!is_user_logged_in());
+                },
+                function () use ($subscription_uuid, $original_phone) {
+                    $view_model = array(
+                        'phone' => '',
+                        'email' => '',
+                        'retry' => '',
+                        'plan' => '',
+                        'amt' => '',
+                        'promo_code' => '',
+                    );
+
+                    if (iwitness_validate_submit('do_sign_up', false)) {
+                        if (isset($_POST['iwitness_do_sign_up_data'])) {
+                            $view_model = $_POST['iwitness_do_sign_up_data'];
+                        }
+                    }
+                    $view_model['subscriptionUuid'] = $subscription_uuid;
+                    if (empty($view_model['phone'])) {
+                        $view_model['phone'] = $original_phone;
+                    }
+                    return $view_model;
+                }
+            );
+        }
+
+
+        /**
+         * display user profile page
+         * @return string
+         */
+        public static function profile_view()
+        {
+            return iwitness_render_view(
+                'profile/view',
+                function () {
+                    return iwitness_is_api_user();
+                },
+                function () {
+                    $api_user = iwitness_get_current_api_user();
+                    if (!$api_user) {
+                        throw new Exception("Couldn't load user info");
+                    }
+
+                    $contact = iwitness_api_contact_report_for_current_user($api_user);
+                    $view_model = array(
+                        'api_user' => $api_user,
+                        'contact' => $contact
+                    );
+
+                    return $view_model;
+                }
+            );
+        }
+
+        /**
+         * edit user profile page
+         * @return string
+         */
+        public static function profile_edit()
+        {
+            return iwitness_render_view(
+                'profile/edit',
+                function () {
+                    return iwitness_is_api_user();
+                },
+                function () {
+                    if (iwitness_validate_submit('do_update_user_profile')) {
+                        $api_user = new iWitness_User();
+                        if (isset($_POST['iwitness_do_update_user_profile_data'])) {
+                            $api_user->exchange_array($_POST['iwitness_do_update_user_profile_data']);
+                        }
+                    } else {
+                        $api_user = iwitness_get_current_api_user();
+                        $session = iWitness()->session();
+                        if (empty($api_user->firstName) && isset($session['iwitness-buyer-info'])) {
+                            $buyer_info = $session['iwitness-buyer-info']->toArray();
+                            $api_user->firstName = $buyer_info['firstName'];
+                            $api_user->lastName = $buyer_info['lastName'];
+                            $api_user->address1 = $buyer_info['address1'];
+                            $api_user->address2 = $buyer_info['address2'];
+                            $api_user->city = $buyer_info['city'];
+                            $api_user->state = $buyer_info['state'];
+                            $api_user->zip = $buyer_info['zip'];
+                            $session['iwitness-buyer-info'] = null;
+                        }
+                    }
+
+                    $contact = iwitness_api_contact_report_for_current_user($api_user);
+                    $view_model = array(
+                        'api_user' => $api_user,
+                        'contact' => $contact
+                    );
+
+                    return $view_model;
+                }
+            );
+        }
+
+        /**
+         * @return string
+         */
+        public static function profile_change_password()
+        {
+            return iwitness_render_view(
+                'profile/change-password',
+                function () {
+                    return iwitness_is_api_user();
+                }
+            );
+        }
+
+        /**
+         * @return string
+         */
+        public static function profile_reset_password()
+        {
+            return iwitness_render_view(
+                'profile/reset-password',
+                null,
+                function () {
+                    if (iwitness_validate_submit('do-reset-password', false)
+                        && isset($_POST['iwitness-reset-password_data'])
+                    ) {
+                        $model = $_POST['iwitness-reset-password_data'];
+                    } else {
+                        $token = isset($_GET['t']) ? $_GET['t'] : '';
+                        list($isValidToken, $message) = iwitness_validate_reset_password_token($token);
+                        $model = array(
+                            'isValidToken' => $isValidToken,
+                            'message' => $message,
+                            'token' => $token
+                        );
+                    }
+                    return $model;
+                }
+            );
+        }
+
+
+        /**
+         * @return string
+         */
+        public static function change_wireless_number()
+        {
+            return iwitness_render_view(
+                'profile/change-number',
+                function () {
+                    return iwitness_is_api_user();
+                },
+                function () {
+                    $data = array('phone' => '');
+                    //form post
+                    if (iwitness_validate_submit('do_change_number')) {
+                        $data['phone'] = !empty($_POST['phone']) ? $_POST['phone'] : '';
+                    }
+                    return $data;
+                }
+            );
+        }
+
+        /**
+         * Login function at home page
+         *
+         * @return string
+         */
+        public static function login()
+        {
+            return iwitness_render_view(
+                'profile/login',
+                function () {
+                    return (!is_user_logged_in());
+                }
+            );
+        }
+
+        /**
+         * Forgot password page
+         *
+         * @return string
+         */
+        public static function forgot_password()
+        {
+            return iwitness_render_view(
+                'profile/forgot-password',
+                function () {
+                    return (!is_user_logged_in());
+                },
+                function(){
+                    $data = array('email' => '');
+                    //form post
+                    if (iwitness_validate_submit('do_forgot_password',false)) {
+                        $data['email'] = !empty($_POST['email']) ? $_POST['email'] : '';
+                    }
+                    return $data;
+                }
+            );
+        }
+
+        /**
+         * Tell a friend page
+         *
+         * @return string
+         */
+        public static function tell_a_friend()
+        {
+            return iwitness_render_view(
+                'profile/tell-a-friend',
+                function () {
+                    return true;
+                },
+                function () {
+                    return array(
+                        'info' => array(
+                            'subject' => 'Check out iWitness',
+                            'message' => "I'm using the iWitness app because I want to stay safe. I hope you'll check it out too."
+                        ),
+                        'user' => iwitness_get_current_api_user(),
+                        'friends' => array()
+                    );
+                }
+            );
+        }
+
+        /**
+         * @return string
+         */
+        public static function renewal_guidance()
+        {
+            return iwitness_render_view(
+                'profile/renewal-guidance'
+            );
+        }
+
+        /**
+         * @param $key
+         * @return null|string
+         */
+        private static function  get_data_from_submit_or_session($key)
+        {
+            $value = null;
+
+            if (iwitness_validate_submit('do_sign_up', false)
+                && isset($_POST['iwitness_do_sign_up_data'][$key])
+            ) {
+                $value = $_POST['iwitness_do_sign_up_data'][$key];
+            }
+
+            //get from session
+            if (empty($value)) {
+                $session = iWitness()->session();
+                if (isset($session['subscriptionUuid']) && !empty($session[$key])) {
+                    $value = $session[$key];
+                }
+            }
+            return $value;
+        }
+
+        public static function help()
+        {
+            return iwitness_render_view(
+                'profile/help'
+            );
+        }
+    }
+
+endif;
+
+new iWitness_User_Shortcodes();

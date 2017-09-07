@@ -1,0 +1,50 @@
+<?php do_action('iwitness_print_notices'); ?>
+
+<h2>Subscription Report</h2>
+<hr>
+
+<div id="subscription-table-container" class="dt-search well">
+    <table id="user-table" class="table table-condensed table-hover table-striped">
+        <thead>
+        <tr>
+            <th data-column-id="firstName" data-sortable="false">First name</th>
+            <th data-column-id="lastName" data-sortable="false">Last name</th>
+            <th data-column-id="phone" data-sortable="false">Phone</th>
+            <th data-column-id="email" data-sortable="false" data-visible="false">Email</th>
+            <th data-column-id="subscriptionStartAt" data-order="desc" data-sortable="false"
+                data-formatter="start-at-formatter">Subscription Start At</th>
+            <th data-column-id="subscriptionExpireAt" data-sortable="false"
+                data-formatter="expired-at-formatter">Subscription Expire At</th>
+        </tr>
+        </thead>
+    </table>
+
+    <!-- search template -->
+    <script type="text/html" id="search-template">
+        <div class="search pull-left">
+            <div class="form-group">
+                <label class="control-label col-sm-3" for="start-date">Start date: </label>
+
+                <div class="col-sm-9">
+                    <input type="text" class="form-control" id="start-date" name="start-date">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-sm-3" for="end-date">End date: </label>
+
+                <div class="col-sm-9">
+                    <input type="text" class="form-control" id="end-date" name="end-date">
+                </div>
+            </div>
+        </div>
+    </script>
+</div>
+
+<?php
+// lazy loading style and script
+wp_print_styles('jquery-ui-css');
+wp_print_scripts('jquery-ui');
+wp_print_scripts('jquery-template-script-plugin');
+wp_print_scripts('jquery-bootgrid-script-plugin');
+wp_print_scripts('iwitness-subscription-report-plugin');
+?>

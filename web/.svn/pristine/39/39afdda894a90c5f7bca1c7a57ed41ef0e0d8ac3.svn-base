@@ -1,0 +1,17 @@
+<?php
+
+/**
+ * Get plans setting
+ * @return array
+ */
+function iwitness_get_plans()
+{
+    $response = iwitness_api_get('/plan', array());
+    $response = $response['_embedded']['plan'];
+
+    $plans = array();
+    foreach ($response as $res) {
+        $plans[$res['key']] = array('price' => $res['price'], 'length' => $res['length']);
+    }
+    return $plans;
+}

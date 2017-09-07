@@ -1,0 +1,66 @@
+<?php
+
+namespace DoctrineMigrations;
+
+use Doctrine\DBAL\Migrations\WordpressMigration;
+use Doctrine\DBAL\Schema\Schema;
+
+/**
+ * Auto-generated Migration: Please modify to your needs!
+ */
+class PERPII_888_20140814095555 extends WordpressMigration
+{
+    public function up(Schema $schema)
+    {
+        global $wpdb;
+
+        $filePath = '/static-content/PERPII-888_20140814095555_Post.html';
+        $content = $this->getStaticContent($filePath);
+
+        // update content news page first
+        $this->savePage(
+            array(
+                'post_name' => 'content-news',
+                'page_template' => 'page-templates/blog-roll-full-width.php',
+                'post_content' => '',
+                'post_title' => 'News',
+            )
+        );
+
+        // then create new post
+        $this->createPage(
+            array(
+                'post_content' => '',
+                'post_type' => 'post',
+                'post_status' => 'publish',
+                'post_name' => 'news',
+                'post_title' => 'New Releases',
+            )
+        );
+
+        $wpdb->query(
+            $wpdb->prepare(
+                "UPDATE wp_posts SET post_content=%s WHERE post_name = %s and post_type=%s;",
+                $content, 'news', 'post'
+            )
+        );
+    }
+
+    public function down(Schema $schema)
+    {
+        $this->deletePageByName('news');
+    }
+
+    /**
+     * Get the content of static content page
+     *
+     * @param $filePath
+     * @return null|string
+     */
+    private function getStaticContent($filePath)
+    {
+        $fullFilePath = realpath(dirname(__FILE__)) . $filePath;
+        $content = file_get_contents($fullFilePath);
+        return $content === false ? '' : $content;
+    }
+}

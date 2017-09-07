@@ -1,0 +1,21 @@
+.dt-search {
+  .search {
+    display: flex;
+    margin: 0 20px 0 0 !important;
+    vertical-align: middle !important;
+    width: auto !important;
+  }
+}
+
+#delete-user-container {
+
+  #user-table {
+    td {
+      button {
+        width: 80px;
+        margin-bottom: 5px;
+      }
+    }
+  }
+
+}

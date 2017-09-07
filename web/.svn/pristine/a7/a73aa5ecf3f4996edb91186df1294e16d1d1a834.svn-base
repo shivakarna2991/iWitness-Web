@@ -1,0 +1,12 @@
+#delete-user-container {
+
+  #user-table {
+    td {
+      button {
+        width: 80px;
+        margin-bottom: 5px;
+      }
+    }
+  }
+
+}

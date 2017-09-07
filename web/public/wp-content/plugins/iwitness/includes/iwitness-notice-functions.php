@@ -1,0 +1,213 @@
+<?php
+
+/**
+ * This file was copied from WooCommerce
+ */
+
+
+if (!defined('ABSPATH')) exit; // Exit if accessed directly
+
+/**
+ * Get the count of notices added, either for all notices (default) or for one particular notice type specified
+ * by $notice_type.
+ *
+ * @param  string $notice_type The name of the notice type - either error, success or notice. [optional]
+ * @return int
+ */
+function iwitness_notice_count($notice_type = '')
+{
+    $notice_count = 0;
+    $all_notices = iWitness()->session_get('iwitness_notices', array());
+
+    if (isset($all_notices[$notice_type])) {
+
+        $notice_count = absint(sizeof($all_notices[$notice_type]));
+
+    } elseif (empty($notice_type)) {
+
+        foreach ($all_notices as $notices) {
+            $notice_count += absint(sizeof($notices));
+        }
+
+    }
+
+    return $notice_count;
+}
+
+/**
+ * See if a notice has already been added
+ *
+ * @param  string $message The text to display in the notice.
+ * @param  string $notice_type The singular name of the notice type - either error, success or notice. [optional]
+ * @return bool
+ */
+function iwitness_has_notice($message, $notice_type = 'success')
+{
+    $notices = iWitness()->session_get('iwitness_notices', array());
+    $notices = isset($notices[$notice_type]) ? $notices[$notice_type] : array();
+    return array_search($message, $notices) !== false;
+}
+
+/**
+ * Add and store a notice
+ *
+ * @param  string $message The text to display in the notice.
+ * @param  string $notice_type The singular name of the notice type - either error, success or notice. [optional]
+ */
+function iwitness_add_notice($message, $notice_type = 'success')
+{
+    $filtered_message = apply_filters('iwitness_add_' . $notice_type, $message);
+    $session = iWitness()->session();
+    $notices = $session['iwitness_notices'];
+    if (!$notices) {
+        $notices = array();
+    }
+    $notices[$notice_type][] = $filtered_message;
+    $session['iwitness_notices'] = $notices;
+}
+
+
+/**
+ * http://blog.zenika.com/index.php?post/2011/05/18/Error-handling-with-REST
+ * informational (100-199)
+ * successful (200-299)
+ * redirection (300-399)
+ * client error (400-499)
+ * server error (500-599)
+ * @param Exception $exception
+ * @internal param \Exception $exception
+ */
+function iwitness_add_api_exception_to_notice(\Exception $exception)
+{
+    $code = $exception->getCode();
+    $data = $exception->getMessage();
+
+    switch (intval($code)) {
+        case $code < 100:
+            $type = 'danger';
+            break;
+        case $code < 200:
+            $type = 'info';
+            break;
+        case $code < 300:
+            $type = 'success';
+            break;
+        case $code < 400:
+            $type = 'warning';
+            break;
+        case $code == 422:
+            $type = 'validation';
+            if ($exception instanceof iWitness_Api_Exception && $exception->is_validation_error()) {
+                $data = $exception->get_validation_errors();
+            }
+            break;
+        default:
+            $type = 'danger';
+            break;
+    }
+
+    if (!is_array($data)) {
+        iwitness_add_notice($data, $type);
+    } else {
+        foreach ($data as $field => $messages) {
+            iwitness_add_notice($field . " : " . implode('<br>', (array)$messages), $type);
+        }
+    }
+}
+
+/**
+ * @param WP_Error $wp_error
+ */
+function iwitness_add_api_wp_error_to_notice(WP_Error $wp_error)
+{
+    if ($wp_error->get_error_code()) {
+        $errors = '';
+        $messages = '';
+        foreach ($wp_error->get_error_codes() as $code) {
+            $severity = $wp_error->get_error_data($code);
+            foreach ($wp_error->get_error_messages($code) as $error) {
+                if ('message' == $severity)
+                    $messages .= '	' . $error . "<br />\n";
+                else
+                    $errors .= '	' . $error . "<br />\n";
+            }
+        }
+        if (!empty($errors)) {
+            iwitness_add_notice($errors, 'danger');
+        }
+        if (!empty($messages)) {
+            iwitness_add_notice($errors, 'success');
+        }
+    } else {
+        $message = '<strong>Login failed:</strong> You have entered an incorrect Username or Password, please try again.';
+        iwitness_add_api_wp_to_notice($message, 'danger');
+    }
+}
+
+
+/**
+ * Unset all notices
+ *
+ * @since 2.1
+ */
+function iwitness_clear_notices()
+{
+    $session = iWitness()->session();
+    $session['iwitness_notices'] = null;
+}
+
+/**
+ * Prints messages and errors which are stored in the session, then clears them.
+ *
+ * @since 2.1
+ */
+function iwitness_print_notices($auto_hide)
+{
+    try {
+        $all_notices = iWitness()->session_get('iwitness_notices', array());
+        $notice_types = apply_filters(
+            'iwitness_notice_types',
+            array('error', 'success', 'notice', 'info', 'danger', 'warning', 'validation')
+        );
+
+        //default value
+        if (is_string($auto_hide) && $auto_hide == '') {
+            $auto_hide = true;
+        }
+
+        foreach ($notice_types as $notice_type) {
+            if (iwitness_notice_count($notice_type) > 0) {
+                iwitness_get_template("error/notice.php", array(
+                    'messages' => $all_notices[$notice_type],
+                    'notice_type' => $notice_type,
+                    'auto_hide' => $auto_hide
+                ));
+            }
+        }
+    } catch (Exception $ex) {
+        iwitness_log_error($ex);
+    }
+    iwitness_clear_notices();
+}
+
+add_action('iwitness_print_notices', 'iwitness_print_notices');
+
+/**
+ * Print a single notice immediately
+ *
+ * @param  string $message The text to display in the notice.
+ * @param  string $notice_type The singular name of the notice type - either error, success or notice. [optional]
+ */
+function iwitness_print_notice($message, $notice_type = 'success')
+{
+    if ('success' === $notice_type)
+        $message = apply_filters('iwitness_add_message', $message);
+
+    iwitness_get_template("error/notice.php", array(
+        'messages' => array(apply_filters('iwitness_add_' . $notice_type, $message)),
+        'notice_type' => $notice_type
+    ));
+}
+
+
+

@@ -1,0 +1,122 @@
+#wspta-plan {
+  padding: 10px;
+}
+
+#wspta-plan .wspta-info{
+  margin-left: 50px;
+  margin-bottom: 30px;
+}
+
+#wspta-plan  #price {
+  color: #045292;
+  font-size: 18px;
+}
+
+#pta-landing-page #logo {
+  padding: 15px;
+  position: relative;
+}
+
+#pta-landing-page #logo #logo-title {
+  margin-left: 10px;
+  font-weight: bolder;
+  font-size: 1.3em;
+  max-width: 200px;
+  line-height: 0.9em;
+}
+
+#pta-landing-page #logo #app-stores {
+  display: inline-block;
+  margin-top: 15px;
+}
+
+#pta-landing-page #kids-bar-outer {
+  margin-top: 10px;
+  background-color: #4e4e4e;
+  height: 100%;
+}
+
+#pta-landing-page #kids-bar-outer #kids-bar {
+  width: 100%;
+  display: flex;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  margin: 0px;
+  padding: 0px;
+}
+
+#pta-landing-page #bottom-content {
+  padding: 25px 0 0 15px;
+  position: relative;
+}
+
+#pta-landing-page #left-panel .intro-text {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 55px;
+  background-color: #77787b;
+  text-align: center;
+  color: #fff;
+  font-size: 1.3em;
+}
+
+#pta-landing-page #left-panel img {
+  position: relative;
+  margin-top: 35px;
+  width: 100%;
+}
+
+#pta-landing-page #right-panel {
+  margin-top: -5px;
+}
+
+#pta-landing-page #right-panel .slogan-title {
+  text-align: right;
+  margin-top: -10px;
+  border-bottom: 1px solid $middleGrey;
+  margin-bottom: 20px;
+
+  h1 {
+    font-size: 2em;
+    line-height: 0.9em;
+  }
+  p{
+    font-size: 1.1em;
+    line-height: 1.3em;
+  }
+}
+
+#pta-landing-page #right-panel .seen-on {
+  width: 100%;
+  height: 75px;
+  line-height: 50px;
+  border-bottom: 1px solid $middleGrey;
+  margin-bottom: 20px;
+
+  img, p {
+    margin-right: 10px;
+  }
+}
+
+#pta-landing-page #right-panel .promo-offer {
+  text-align: right;
+  border-bottom: 1px solid $middleGrey;
+  margin-bottom: 20px;
+
+  h3 {
+    font-size: 1.5em;
+    line-height: 0.9em;
+  }
+  .offer {
+    font-size: 5em;
+    line-height: 0.9em;
+  }
+  .promo {
+    span{
+      margin-right: 10px;
+    }
+  }
+}

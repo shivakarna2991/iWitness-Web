@@ -1,0 +1,177 @@
+<?php
+/**
+ * Manage all routes for iWitness pages
+ */
+//home url
+if (!defined('IWITNESS_PAGE_HOME')) {
+    define('IWITNESS_PAGE_HOME', home_url());
+}
+
+// theme url
+if (!defined('IWITNESS_THEME_URL')) {
+    define('IWITNESS_THEME_URL', home_url() . '/wp-content/themes/' . wp_get_theme());
+}
+
+// contacts
+if (!defined('IWITNESS_PAGE_CONTACT_LIST_ID')) {
+    define('IWITNESS_PAGE_CONTACT_LIST_ID', 'content-contacts');
+}
+
+if (!defined('IWITNESS_PAGE_CONTACT_EDIT_ID')) {
+    define('IWITNESS_PAGE_CONTACT_EDIT_ID', 'content-contacts-edit');
+}
+
+// events
+if (!defined('IWITNESS_PAGE_EVENT_LIST_ID')) {
+    define('IWITNESS_PAGE_EVENT_LIST_ID', 'content-events');
+}
+
+if (!defined('IWITNESS_PAGE_EVENT_VIEW_ID')) {
+    define('IWITNESS_PAGE_EVENT_VIEW_ID', 'content-event-view');
+}
+
+// users
+if (!defined('IWITNESS_PAGE_USER_PROFILE_VIEW_ID')) {
+    define('IWITNESS_PAGE_USER_PROFILE_VIEW_ID', 'profile');
+}
+
+if (!defined('IWITNESS_PAGE_USER_PROFILE_EDIT_ID')) {
+    define('IWITNESS_PAGE_USER_PROFILE_EDIT_ID', 'profile-edit');
+}
+
+if (!defined('IWITNESS_PAGE_USER_LOGIN_ID')) {
+    define('IWITNESS_PAGE_USER_LOGIN_ID', 'login');
+}
+
+if (!defined('IWITNESS_PAGE_FORGOT_PASSWORD_ID')) {
+    define('IWITNESS_PAGE_FORGOT_PASSWORD_ID', 'forgot-password');
+}
+
+if (!defined('IWITNESS_PAGE_CHANGE_NUMBER_ID')) {
+    define('IWITNESS_PAGE_CHANGE_NUMBER_ID', 'change-number');
+}
+
+if (!defined('IWITNESS_PAGE_CHANGE_PASSWORD_ID')) {
+    define('IWITNESS_PAGE_CHANGE_PASSWORD_ID', 'change-password');
+}
+
+if (!defined('IWITNESS_PAGE_TELL_A_FRIEND_ID')) {
+    define('IWITNESS_PAGE_TELL_A_FRIEND_ID', 'tell-a-friend');
+}
+
+// purchase
+if (!defined('IWITNESS_PAGE_PURCHASE_ID')) {
+    define('IWITNESS_PAGE_PURCHASE_ID', 'start-now');
+}
+
+// Admin dashboard
+if (!defined('IWITNESS_PAGE_ADMIN_DASHBOARD_ID')) {
+    define('IWITNESS_PAGE_ADMIN_DASHBOARD_ID', 'api-admin-dashboard');
+}
+
+if (!defined('IWITNESS_PAGE_PROMO_CODE_LIST_ID')) {
+    define('IWITNESS_PAGE_PROMO_CODE_LIST_ID', 'promo-code-list');
+}
+
+if (!defined('IWITNESS_PAGE_ADMIN_DELETE_USER_ID')) {
+    define('IWITNESS_PAGE_ADMIN_DELETE_USER_ID', 'admin-delete-user');
+}
+
+if (!defined('IWITNESS_PAGE_SIGN_UP')) {
+    define('IWITNESS_PAGE_SIGN_UP', 'sign-up');
+}
+
+if (!defined('IWITNESS_PAGE_NOTIFICATION_ID')) {
+    define('IWITNESS_PAGE_NOTIFICATION_ID', 'notification');
+}
+
+if (!defined('IWITNESS_PAGE_GIFT_CARD_ID')) {
+    define('IWITNESS_PAGE_GIFT_CARD_ID', 'gift-card');
+}
+
+if (!defined('IWITNESS_CONGRATULATION_ID')) {
+    define('IWITNESS_CONGRATULATION_ID', 'congratulation');
+}
+
+// Report
+if (!defined('IWITNESS_USER_REPORT_ID')) {
+    define('IWITNESS_USER_REPORT_ID', 'user-report');
+}
+
+if (!defined('IWITNESS_USER_EVENT_REPORT_ID')) {
+    define('IWITNESS_USER_EVENT_REPORT_ID', 'user-event-report');
+}
+
+if (!defined('IWITNESS_REVENUE_REPORT_ID')) {
+    define('IWITNESS_REVENUE_REPORT_ID', 'revenue-report');
+}
+
+if (!defined('IWITNESS_SUBSCRIPTION_REPORT_ID')) {
+    define('IWITNESS_SUBSCRIPTION_REPORT_ID', 'subscription-report');
+}
+
+if (!defined('IWITNESS_PAGE_RENEW_ID')) {
+    define('IWITNESS_PAGE_RENEW_ID', 'renew');
+}
+
+if (!defined('IWITNESS_PAGE_SAFE_KIDS_ID')) {
+    define('IWITNESS_PAGE_SAFE_KIDS_ID', 'safekids');
+}
+
+if (!defined('IWITNESS_PAGE_SEATTLE_UNIVERSITY_ID')) {
+    define('IWITNESS_PAGE_SEATTLE_UNIVERSITY_ID', 'seattleu');
+}
+
+if (!defined('IWITNESS_PAGE_FEEDBACK_ID')) {
+    define('IWITNESS_PAGE_FEEDBACK_ID', 'help');
+}
+
+if (!defined('IWITNESS_PAGE_FRIEND_CONNECT_ID')) {
+    define('IWITNESS_PAGE_FRIEND_CONNECT_ID', 'friend-connect');
+}
+
+if (!defined('IWITNESS_PAGE_FRIEND_CONNECTED_ID')) {
+    define('IWITNESS_PAGE_FRIEND_CONNECTED_ID', 'friend-connected');
+}
+
+if (!defined('IWITNESS_PAGE_FRIEND_ALERT_ID')) {
+    define('IWITNESS_PAGE_FRIEND_ALERT_ID', 'friend-alert');
+}
+
+
+/**
+ * Every body that in this list can access to website
+ *
+ * @return array
+ */
+function  iwitness_get_unauthorize_pages()
+{
+    $pages = array('reset-password', 'content-about', 'claim-code', 'content-contact', 'content-crime-stats',
+        'content-user-agreement', IWITNESS_PAGE_FRIEND_CONNECT_ID, IWITNESS_PAGE_FRIEND_CONNECTED_ID,
+        IWITNESS_PAGE_FRIEND_ALERT_ID,
+        'content-faq', 'forgot-password', 'content-how-it-works', 'content-landing-page', 'content-learn-more',
+        IWITNESS_PAGE_USER_LOGIN_ID, 'content-news', IWITNESS_PAGE_SAFE_KIDS_ID, IWITNESS_PAGE_SEATTLE_UNIVERSITY_ID,
+        IWITNESS_PAGE_SIGN_UP, 'start-now',
+        IWITNESS_PAGE_TELL_A_FRIEND_ID, 'content-terms-of-service', 'content-terms-of-use', 'use-promo-code',
+        IWITNESS_PAGE_GIFT_CARD_ID, IWITNESS_CONGRATULATION_ID, IWITNESS_PAGE_FEEDBACK_ID
+    );
+    return $pages;
+}
+
+/**
+ * List of pages that only access when he/she was expired
+ *
+ * @return array
+ */
+function  iwitness_get_list_of_allow_expired_subscription_pages()
+{
+    $pages = array_merge(iwitness_get_unauthorize_pages(), array(
+        IWITNESS_PAGE_RENEW_ID,
+        IWITNESS_PAGE_CHANGE_PASSWORD_ID,
+        //IWITNESS_PAGE_NOTIFICATION_ID,
+        IWITNESS_PAGE_CHANGE_NUMBER_ID,
+        IWITNESS_PAGE_USER_PROFILE_VIEW_ID,
+        IWITNESS_PAGE_USER_PROFILE_EDIT_ID,
+    ));
+    return $pages;
+}

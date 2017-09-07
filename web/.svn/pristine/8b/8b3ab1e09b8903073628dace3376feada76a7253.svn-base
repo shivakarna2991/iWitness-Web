@@ -1,0 +1,104 @@
+<?php
+/**
+ * iWitness_Friend_Shortcodes class.
+ *
+ * @class       iWitness_User_Shortcodes
+ * @version     1.0.0
+ * @package     iWitness/Classes
+ * @category    Class
+ * @author      iWitness
+ */
+
+if (!defined('ABSPATH')) exit; // Exit if accessed directly
+if (!class_exists('iWitness_Friend_Shortcodes')) :
+
+
+    class iWitness_Friend_Shortcodes
+    {
+        public function __construct()
+        {
+            // for purchase
+            add_shortcode('iwitness_friend_connect', array($this, 'friend_connect'));
+            add_shortcode('iwitness_friend_alert', array($this, 'friend_alert'));
+            add_shortcode('iwitness_friend_connected', array($this, 'friend_connected'));
+        }
+
+        /**
+         * @return string
+         */
+        public static function friend_connect()
+        {
+            return iwitness_render_view(
+                'friend/connect',
+                null,
+                function () {
+                    if (iwitness_validate_submit('do-friend-connect', false)
+                        && isset($_POST['iwitness-friend-connect-data'])
+                    ) {
+                        $model = $_POST['iwitness-friend-connect-data'];
+                    } else {
+                        $token = isset($_GET['secret_key']) ? $_GET['secret_key'] : '';
+                        $decline = isset($_GET['decline']) ? $_GET['decline'] : 0;
+                        list($isValidToken, $message, $contact, $user) = iwitness_validate_friend_connect_token($token);
+                        $model = array(
+                            'contact' => $contact,
+                            'user' => $user,
+                            'isValidToken' => $isValidToken,
+                            'error' => $message,
+                            'token' => $token,
+                            'decline' => $decline
+                        );
+                    }
+                    return $model;
+                }
+            );
+        }
+
+        /**
+         * Friend alert for friend of user
+         *
+         * @return string
+         */
+        public function friend_alert()
+        {
+            $id = isset($_GET['id']) ? $_GET['id'] : '';
+            return iwitness_render_view(
+                'friend/alert',
+                function () use ($id) {
+                    if (empty($id)) {
+                        throw new Exception("Invalid video link");
+                    }
+                    return true;
+                },
+                function () use ($id) {
+                    return iwitness_api_get('/event/' . $id.'?extends=User.timezone');
+                }
+            );
+        }
+
+        /**
+         * @return string
+         */
+        public static function friend_connected()
+        {
+            $session = iWitness()->session();
+            $model = null;
+            if (isset($session['friend-connected'])) {
+                $model = $session['friend-connected'];
+            }
+            return iwitness_render_view(
+                'friend/connected',
+                function () use ($model) {
+                    return ($model != null && $model instanceof Recursive_ArrayAccess);
+                },
+                function () use ($model) {
+                    return $model->toArray();
+                }
+            );
+        }
+
+    }
+
+endif;
+
+new iWitness_Friend_Shortcodes();

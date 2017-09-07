@@ -1,0 +1,110 @@
+<div class="form-horizontal">
+    <fieldset>
+        <div class="form-group">
+            <label for="first_name" class="col-md-2 control-label">First Name</label>
+            <div class="col-md-7">
+                <input type="text" name="first_name" value="<?= $view_model['firstName'] ?>"
+                       class="required form-control"
+                       placeholder=""/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="last_name" class="col-md-2 control-label">Last Name</label>
+
+            <div class="col-md-7">
+                <input type="text" name="last_name" value="<?= $view_model['lastName'] ?>"
+                       class="required form-control"
+                       placeholder=""/>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="address" class="col-md-2 control-label">Street Address 1</label>
+
+            <div class="col-md-7">
+                <input type="text" name="address" value="<?= $view_model['address1'] ?>"
+                       class="required form-control"
+                       placeholder=""/>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="address2" class="col-md-2 control-label">
+                Street Address 2
+                <small class="text-muted">(optional)</small>
+            </label>
+
+            <div class="col-md-7">
+                <input type="text" name="address2" class="form-control"
+                       value="<?= $view_model['address2'] ?>"
+                       placeholder=""/>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="city" class="col-md-2 control-label">City</label>
+
+            <div class="col-md-7">
+                <input type="text" name="city" class="required form-control"
+                       value="<?= $view_model['city'] ?>"
+                       placeholder=""/>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="state" class="col-md-2 control-label">State</label>
+
+            <div id="usStates" class="col-md-3">
+                <!-- For US - show select with states -->
+                <select name="state" class="required form-control">
+                    <?php
+                    iwitness_view_helper_select_options(
+                        $view_model['state'],
+                        array_merge(array('' => 'Please select...'), iwitness_get_states())
+                    );
+                    ?>
+                </select>
+                <label for="usStates" class="control-label error" style="display:none">Please select
+                    state</label>
+            </div>
+
+            <div id="otherStates" class="col-md-3" style="display:none;">
+                <!-- For other countries - show free-form input -->
+                <input type="text" name="state" value="<?= $view_model['state'] ?>"
+                       class="required form-control"
+                       disabled="disabled" placeholder=""/>
+            </div>
+            <label for="otherStates" class="error" style="display:none">Please input state</label>
+
+            <label for="zip" class="col-md-2 control-label">Zip Code</label>
+            <div class="col-md-2">
+                <input type="text" name="zip" value="<?= $view_model['zip'] ?>"
+                       class="required form-control"
+                       placeholder=""/>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="country" class="col-md-2 control-label">Country</label>
+            <div class="col-md-7">
+                <select name="country" class="required form-control">
+                    <option value="US"
+                            selected="selected" <?= $view_model['country'] == 'US' ? 'selected="selected"' : '' ?>  >
+                        United States
+                    </option>
+                    <option value="CA" <?= $view_model['country'] == 'CA' ? 'selected="selected"' : '' ?>>
+                        Canada
+                    </option>
+                </select>
+            </div>
+        </div>
+
+        <?php
+        if (isset($view_model['is_gift'])) {
+            include_once($plugin_path . '/templates/partial/billing-info-footer-gift.php');
+        } else {
+            include_once($plugin_path . '/templates/partial/billing-info-footer-common.php');
+        }
+        ?>
+    </fieldset>
+</div>

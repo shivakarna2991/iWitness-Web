@@ -1,0 +1,317 @@
+;
+(function ($) {
+    "use strict";
+    $().ready(function () {
+        GiftCard.init();
+		$('#free-gift-plan').click(function(){
+			 $('.payment').hide();
+			 $('#card_number').removeClass('required creditcard');
+			 $('#exp_month').removeClass('required');
+			 $('#exp_year').removeClass('required');
+			 $('#card_code').removeClass('required');
+		});
+		$('#gift-plan').click(function(){
+			 $('.payment').show();
+			 $('#card_number').addClass('required creditcard');
+			 $('#exp_month').addClass('required');
+			 $('#exp_year').addClass('required');
+			 $('#card_code').addClass('required');
+		});
+    });
+
+    var GiftCard = (function () {
+        var $mainForm = $('#main-gift-card-container'),
+            $giftCardModal = $('#gift-card-detail'),
+            isEdit = false,
+            dateToday = new Date();
+
+        function init() {
+            bindingModalEvents();
+            bindingCharacterCountEvents();
+            bindingControls();
+            bindingChangedControlEvents();
+        }
+
+        function bindingModalEvents() {
+            var $addAnotherBtn = $('#add_another'),
+                $giftCardModal = $('#gift-card-detail'),
+                url = $.iw.getWordPressAjaxUrl();
+
+            // binding for add another button
+            $addAnotherBtn.on('click', function () {
+                isEdit = false;
+                clearModalData();
+                $giftCardModal.modal();
+            });
+
+            // binding validate for this modal
+            $giftCardModal.validate({
+                meta: "validator",
+
+                submitHandler: function (form) {
+                    storeRecipientData();
+                    populateRecipientTable();
+                    bindingTableEvents();
+                    $(form).modal('hide');
+                },
+
+                rules: {
+                    email: {
+                        onfocusout: true,
+                        onkeyup: true,
+                        onclick: false,
+                        required: true,
+                        email: true,
+                        remote: {
+                            url: url,
+                            type: "post",
+                            data: {
+                                email: function () {
+                                    return $('#email').val();
+                                },
+                                action: "validate_gift_card_email"
+                            },
+                            async: true
+                        }
+                    }
+                }
+            });
+
+            // fixed not enough space on mobile
+            $giftCardModal.on('show.bs.modal', function () {
+                var $modal = $(this);
+                $modal.css('margin-top', ($(window).height() - $modal.height()) / 2 - parseInt($modal.css('padding-top')));
+            });
+        }
+
+        function bindingCharacterCountEvents() {
+            // binding character count plugin
+            var $textAreas = $('textarea', $mainForm),
+                $textAreaBox = $textAreas.parent(),
+                totalCharacters = $textAreaBox.data('total-characters');
+
+            $textAreaBox.iwCharacterCount(totalCharacters);
+            $textAreas.on('keyup', function () {
+                $(this).parent().iwCharacterCount(totalCharacters);
+            });
+        }
+
+        function bindingControls() {
+            var $deliveryDate = $('#recipient-delivery-date'),
+                $collapse = $('.collapse', $giftCardModal),
+                $accordion = $('#accordion'),
+                $title = $('.sample a:first', $accordion);
+
+            $deliveryDate.datepicker({
+                minDate: dateToday,
+                defaultDate: dateToday.mmddyyyy()
+            });
+
+            $collapse.collapse();
+            $collapse.on('hidden.bs.collapse', function () {
+                $title.html('<span class="glyphicon glyphicon-chevron-down"></span> Sample Gift Email');
+            });
+            $collapse.on('shown.bs.collapse', function () {
+                $title.html('<span class="glyphicon glyphicon-chevron-up"></span> Sample Gift Email');
+            });
+
+            populateRecipientTable();
+            bindingTableEvents();
+        }
+
+        function bindingTableEvents() {
+            var $table = $('#recipient-table', $mainForm),
+                $recipients = $('#recipients'),
+                recipients = JSON.parse($('#recipients').val());
+            // binding event for remove button
+            $table
+                .find('tbody td a.remove')
+                .off()
+                .on('click', function (e) {
+                    e.preventDefault();
+
+                    var recipients_te = JSON.parse($('#recipients').val());
+                    if (confirm('Do you want to delete?')) {
+                        var self = this,
+                            $row = $(self).closest('tr'),
+                            email = $row.find('td:first').find('span').html();
+                        var result = $.grep(recipients_te, function (recipient, i) {
+                            return recipient.email === email;
+                        }, true);
+
+                        $row.remove();
+                        //$recipients.val(JSON.stringify(result));
+                       $('#recipients').val(JSON.stringify(result));
+                        updateRecipientPrice();
+                    }
+                });
+
+            // binding event for edit button
+            $table
+                .find('tbody td a.edit')
+                .off()
+                .on('click', function (e) {
+                    e.preventDefault();
+
+                    var $row = $(this).closest('tr'),
+                        email = $row.find('td:first').find('span').html();
+
+                    // binding modal
+                    var recipient = $.grep(recipients, function (recipient, i) {
+                        return recipient.email === email;
+                    });
+
+                    recipient = recipient[0]; // get first object
+                    $('#recipient-name').val(recipient.name);
+                    $('#recipient-email').val(recipient.email);
+                    $('#verify-email').val(recipient.email);
+
+                    if(recipient.deliveryDate !== undefined && recipient.deliveryDate !== '') {
+                        $('#recipient-delivery-date').val(recipient.deliveryDate);
+                    }
+
+                    $('#recipient-message').val(recipient.message);
+                    recipients = $.grep(recipients, function (recipient, i) {
+                        return recipient.email !== email;
+                    });
+                    $recipients.val(JSON.stringify(recipients));
+                    // show modal
+                    $giftCardModal.modal('show');
+                    isEdit = true;
+                });
+        }
+
+        function bindingChangedControlEvents() {
+            var $senderName = $('#sender-name'),
+                $recipientName = $('#recipient-name'),
+                $message = $('#recipient-message'),
+
+                $mailTo = $('#mailer-to'),
+                $mailFrom = $('#mailer-from'),
+                $mailerText = $('#mailer-text');
+
+            /** these code below for init page, then we need to fill data for it **/
+            if($recipientName.val() != '') {
+                $mailTo.html($recipientName.val());
+            }
+            if($senderName.val() != '') {
+                $mailFrom.html($senderName.val());
+            }
+            if($message.val() != '') {
+                $mailerText.html($message.val());
+            }
+
+            /** these code below for changed detect **/
+            $senderName.change(function () {
+                $mailFrom.html($(this).val());
+            });
+            $recipientName.change(function () {
+                $mailTo.html($(this).val());
+            });
+            $message.change(function () {
+                $mailerText.html($(this).val());
+            });
+        }
+
+        function populateRecipientTable() {
+            var $table = $('#recipient-table'),
+                $recipients = $('#recipients');
+
+            // binding data from the server
+            if (window.recipientData && window.recipientData.length > 0) { // global variable
+                $recipients.val(JSON.stringify(window.recipientData));
+            }
+
+            var recipients = JSON.parse($recipients.val());
+            if (recipients.length > 0) {
+                var removeBtn = '<a class="remove">Remove</a>',
+                    editBtn = '<a class="edit">Edit</a>';
+
+                $table.find('tbody tr.no-data:first').remove();
+                $table.find('tbody tr').not(':last').remove();
+
+                // todo: will find out another way to build the row template, maybe jquery template
+                $.each(recipients, function (index, recipient) {
+                    var hidden = '<span class="hide">' + recipient.email + '</span>',
+                        newRow = '<tr>';
+                    newRow += '<td class="text-center">' + (index + 1) + hidden + '</td>';
+                    newRow += '<td>' + recipient.name + '</td>';
+                    newRow += '<td>' + recipient.email + '</td>';
+                    newRow += '<td>' + recipient.deliveryDate + '</td>';
+                    newRow += '<td> ' + editBtn + ' ' + removeBtn + ' </td>';
+                    newRow += '</tr>';
+                    $table.find('tbody tr:last').before(newRow);
+                });
+
+                updateRecipientPrice();
+                $table.removeClass('hide');
+            }
+        }
+
+        function updateRecipientPrice() {
+            var $table = $('#recipient-table'),
+                $recipients = $('#recipients'),
+                recipients = JSON.parse($recipients.val());
+			//console.log(recipients);
+	        var user_sender_email = $('#sender-email_hd').val();
+	        var user_login = $('#sender-user_hd').val();
+			var admin_emails_array = new Array('johndoe@gmail.com','dremer@remerinc.com', 'ajones@remerinc.com','terih@remerinc.com',' joe@jokonek.com','charwood@remerinc.com','bsiemen@remerinc.com');
+			var admin_email = false;  
+			if($.inArray(user_sender_email, admin_emails_array) != -1) {
+			       var admin_email = true;  
+			}
+            if (user_login== 'no'){
+				var recipients_cost = 29.99;
+			}
+		    if (user_login =='yes' && !admin_email){	 
+		   		var recipients_cost = 19.99;
+			}
+			if (admin_email) {
+				if($('#free-gift-plan').is(':checked')) 
+		   		    var recipients_cost = 0.00;
+				else
+		   		    var recipients_cost = 19.99;
+		    }
+            
+            $table
+                .find('tbody tr:last')
+                .find('span')
+                .html('$' + (recipients_cost * recipients.length))
+                .addClass('text-danger');
+        }
+
+        function storeRecipientData() {
+            var $recipients = $('#recipients'),
+                recipients = JSON.parse($recipients.val()),
+                name = $('#recipient-name').val(),
+                email = $('#recipient-email').val(),
+                deliveryDate = $('#recipient-delivery-date').val(),
+                message = $('#recipient-message').val();
+
+            // push new item
+            recipients.push({
+                name: name,
+                email: email,
+                deliveryDate: deliveryDate,
+                message: message
+            });
+            $recipients.val(JSON.stringify(recipients));
+        }
+
+        function clearModalData() {
+            $('#recipient-name').val('');
+            $('#recipient-email').val('');
+            $('#verify-email').val('');
+            $('#recipient-message').val('');
+            $('#mailer-from').val('');
+            $('#mailer-text').val('');
+            $('#recipient-delivery-date').val(dateToday.mmddyyyy());
+        }
+
+        return {
+            init: init
+        };
+    })();
+
+})(jQuery);
+

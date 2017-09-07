@@ -1,0 +1,45 @@
+<?php do_action('iwitness_print_notices'); ?>
+
+<div id="profile">
+    <h2>Reset your password</h2>
+    <hr>
+
+    <?php if ($view_model['isValidToken'] == true): ?>
+        <form method="POST" data-validate="true" role="form">
+
+            <input type="hidden" name="token"
+                   value="<?php echo $view_model['token'] ?>"/>
+
+            <div class="form-horizontal">
+                <div class="form-group">
+                    <label for="password" class="col-md-3 control-label">New Password:</label>
+
+                    <div class="col-md-5">
+                        <input type="password" class="form-control" name="new_password" id="new_password"
+                               data-rule-required="true">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirm_password" class="col-md-3 control-label">Confirm New Password:</label>
+
+                    <div class="col-md-5">
+                        <input type="password" class="form-control" name="confirm_password" id="confirm_password"
+                               data-rule-required="true" data-rule-standard-password-format data-rule-equalTo="#new_password">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-5 col-md-offset-3">
+                        <button type="submit" class="btn btn-primary" name="action" value="iwitness_do_reset_password">
+                            Reset
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+    <?php else: ?>
+        <h6><?= $view_model['message'] ?></h6>
+    <?php endif; ?>
+</div>

@@ -1,0 +1,191 @@
+;
+(function ($) {
+    "use strict";
+
+    $().ready(function () {
+        Purchase.init();
+    });
+
+    var Purchase = (function () {
+        var $androidForm = $('#frmAndroid')
+            , $windowsForm = $('#frmWindows')
+            , $warningOverlay = $('#iphone3-warning-overlay')
+            , $orderForm = $('#order')
+            , $nextBtn = $('#next')
+            , $backBtn = $('#back')
+            , $android = $('#android', $orderForm)
+            , $windows7 = $('#windows7', $orderForm)
+            , iphone3 = $('#iphone3', $orderForm);
+
+        function init() {
+            bindEvents();
+            bindValidation();
+            bindFeedbackForm();
+            fill();
+            pickStateField();
+        }
+
+        function bindEvents() {
+
+            /* processing for Windows form */
+            $windowsForm.submit(function (e) {
+                e.preventDefault();
+                var $self = $(this), params = $self.find('form').serialize();
+
+                $.post($self.find('form').attr('action'), params, function () {
+                    $self.fadeOut('fast');
+                });
+            });
+
+            // Overlay warning for iPhone 3Gs on signup form
+            $('input[type="radio"][name="phone_model"]', $orderForm).change(function (e) {
+                $(this).val() == 'iphone3' && $(this).attr('checked')
+                    ? $warningOverlay.fadeIn('fast')
+                    : $warningOverlay.fadeOut('fast');
+            });
+
+            /* processing for the rest of screen */
+            $nextBtn.click(function () {
+                preSubmit();
+            });
+
+            $backBtn.click(function () {
+                fill();
+            });
+
+            $('select[name="country"]', $orderForm).change(pickStateField);
+
+            $android.click(function () {
+                $windowsForm.modal('hide');
+            });
+
+            $windows7.click(function () {
+                $windowsForm.modal('show');
+                $androidForm.fadeOut('fast');
+                $(':input[name="email"]', $windowsForm).focus();
+            });
+
+            iphone3.click(function () {
+                $windowsForm.modal('hide');
+                $androidForm.hide();
+            });
+        }
+
+        function bindValidation() {
+
+            $orderForm.validate({
+                meta: "validator",
+                submitHandler: function (form) {
+                    if (!$('#agree:checked').length) {
+                        $('#agree').parent().next().show();
+                        return false;
+                    }
+
+                    if ($(form).valid()) {
+                        form.submit();
+                    }
+                },
+
+                rules: {
+                    promoCode: {
+                        onfocusout: false,
+                        onkeyup: false,
+                        onclick: false,
+                        required: true,
+                        remote: {
+                            url: $.iw.getWordPressAjaxUrl(),
+                            type: "post",
+                            data: {
+                                promoCode: function () {
+                                    return $('#promoCode').val();
+                                },
+                                action: "validate_promotion_code"
+                            },
+                            async: false
+                        }
+                    }
+                },
+                messages: {
+                    promoCode: {
+                        remote: "Promo code is invalid."
+                    }
+                },
+                errorPlacement: $.iw.customizedErrorPlacement
+            });
+        }
+
+        function bindFeedbackForm() {
+            $('#other-platform').each(function () {
+                $(this).validate({
+                    meta: "validator",
+                    submitHandler: function (form) {
+                        if ($(form).valid()) {
+                            $(form).ajaxSubmit({
+                                url: $.iw.getWordPressAjaxUrl(),
+                                dataType: 'json',
+                                success: function (r) {
+                                    $('#frmWindows').modal('hide');
+                                }
+                            });
+                        }
+                    }
+                })
+            });
+        }
+
+        function pickStateField() {
+            var $orderContainer = $('.order-form', $orderForm)
+                , us = $('select[name="country"]', $orderContainer).val() == 'US';
+
+            $('#usStates').toggle(us).find('select').attr('disabled', !us);
+            $('#otherStates').toggle(!us).find('select').attr('disabled', us);
+
+            $('label[for="otherStates"]', $orderContainer).hide();
+            $('label[for="usStates"]', $orderContainer).hide();
+        }
+
+        function preSubmit() {
+            if (!$orderForm.valid()) {
+                fill();
+            } else {
+                // apply form values to review screen
+                $.each($orderForm.serializeArray(), function () {
+                    var name = this.name, value = this.name == 'card_num'
+                        ? this.value.substr(this.value.length - 4)
+                        : this.value;
+
+                    $('[data-name="' + name + '"]', $orderForm).html(value);
+                    $('[data-for="' + name + '"]', $orderForm)
+                        .hide()
+                        .filter('[data-value="' + value + '"]')
+                        .show();
+                });
+                review();
+            }
+        }
+
+        function error(message) {
+            fill();
+            // $("html,body").scrollTop(750);
+            $('.error-block', $orderForm).html(message).show();
+            $('.status-bar', $orderForm).fadeIn();
+        }
+
+        function review() {
+            $('.order-form', $orderForm).hide();
+            $('.review', $orderForm).show();
+
+            _gaq.push(['_setAccount', 'UA-30469246-1']);
+            _gaq.push(['_trackPageview']);
+        }
+
+        function fill() {
+            $('.order-form', $orderForm).show();
+            $('.review', $orderForm).hide();
+        }
+
+        return {init: init};
+
+    })();
+
+})(jQuery);

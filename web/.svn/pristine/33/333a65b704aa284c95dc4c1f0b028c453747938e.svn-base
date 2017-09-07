@@ -1,0 +1,62 @@
+<?php
+$coupons = $view_model;
+$page_info = isset($view_model['page_info']) ? $view_model['page_info'] : array();
+?>
+
+<div class="row">
+    <div class="col-md-6">
+        <h2>Generated promo codes list</h2>
+    </div>
+    <div class="col-md-6">
+        <a href="<?php echo iwitness_get_page_path(IWITNESS_PAGE_ADMIN_DASHBOARD_ID); ?>"
+           class="btn btn-primary pull-right" style="margin-top:20px">Create Promotion</a>
+    </div>
+</div>
+<hr>
+
+<div class="table-responsive">
+    <table class="table table-bordered table-striped table-hover">
+        <thead>
+        <tr class="bg-grey">
+            <th>Sr No</th>
+            <th>Codes</th>
+            <th>Free</th>
+            <th>Current Usages</th>
+            <th>Active</th>
+            <th>Price</th>
+            <th>Name</th>
+            <th>Max Redemption</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Plan</th>
+            <th>Code String</th>
+
+        </tr>
+        </thead>
+        <tbody>
+        <?php foreach ($coupons as $index => $coupon): ?>
+            <tr>
+                <td><?php echo $index + 1; ?></td>
+                <td><?php echo $coupon['code']; ?></td>
+                <td><?php echo $coupon['price'] <= 0 ? '<span class="text-success glyphicon glyphicon-ok"></span>' : ''; ?></td>
+                <td><?php echo $coupon['currentUsages']; ?></td>
+                <td><?php echo $coupon['isActive'] == 1 ? '<span class="text-success glyphicon glyphicon-ok"></span>' : ''; ?></td>
+                <td>$ <?php echo $coupon['price']; ?></td>
+                <td><?php echo $coupon['name']; ?></td>
+                <td><?php echo $coupon['maxRedemption']; ?></td>
+                <td><?php echo iwitness_view_helper_format_date($coupon['redemptionStartDate']); ?></td>
+                <td><?php echo iwitness_view_helper_format_date($coupon['redemptionEndDate']); ?></td>
+                <td><?php echo $coupon['plan']; ?></td>
+                <td><?php echo $coupon['codeString']; ?></td>
+            </tr>
+        <?php endforeach; ?>
+        </tbody>
+        <tfoot>
+        <tr>
+            <td colspan="6">
+                <?php iwitness_pager($page_info, iwitness_get_page_path(IWITNESS_PAGE_PROMO_CODE_LIST_ID)); ?>
+            </td>
+        </tr>
+        </tfoot>
+    </table>
+</div>

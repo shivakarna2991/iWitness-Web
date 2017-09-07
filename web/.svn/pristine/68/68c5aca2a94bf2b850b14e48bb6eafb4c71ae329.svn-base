@@ -1,0 +1,127 @@
+;
+(function ($) {
+    "use strict";
+
+    $().ready(function () {
+        SubscriptionReport.init();
+    });
+
+    var SubscriptionReport = (function () {
+
+        var $subscriptionTableContainer = $('#subscription-table-container'),
+            $subscriptionTable = $subscriptionTableContainer.find('table'),
+            $startDate = $('#start-date'),
+            $endDate = $('#end-date'),
+            $search = $('#search');
+
+        function init() {
+            // binding date pickers
+            bindDatePickers();
+
+            // binding user table
+            $subscriptionTableContainer.iwBindingTable();
+
+            // binding search event
+            bindSearch();
+        }
+
+        function bindDatePickers() {
+            $startDate.datepicker({
+                changeMonth: true,
+                changeYear: true,
+                onSelect: function (selected) {
+                    $endDate.datepicker("option", "minDate", selected)
+                }
+            });
+
+            $endDate.datepicker({
+                changeMonth: true,
+                changeYear: true,
+                onSelect: function (selected) {
+                    $startDate.datepicker("option", "maxDate", selected)
+                }
+            });
+        }
+
+        function bindSearch() {
+            $search.on('click', function (e) {
+                e.preventDefault();
+
+                if ($startDate.val() != '' && $endDate.val() != '') {
+                    getRemoteData({
+                        'startDate': $startDate.val(),
+                        'endDate': $endDate.val()
+                    });
+                } else {
+                    getRemoteData();
+                }
+            });
+        }
+
+        function getRemoteData($params) {
+            $(this)
+                .iwGetRemoteData(buildSearchQuery($params))
+                .done(function (data) {
+
+                    $subscriptionTable.find("tbody").find('tr').remove(); // remove old data first
+                    if (data._embedded && data._embedded.user.length > 0) {
+                        var body = buildTableBody(data._embedded.user);
+
+                        $('#no-record').addClass('hide');
+                        $subscriptionTable.find("tbody").append($(body).find('tr'));
+                    } else {
+                        $('#no-record').removeClass('hide');
+                    }
+
+                    $subscriptionTable.trigger("update");
+                });
+        }
+
+        function buildSearchQuery(params) {
+            var query = '/user?';
+            if (params != undefined) {
+
+                query += 'expired_search=';
+                if (params.startDate != undefined && params.endDate != undefined) {
+
+                    query += new Date(params.startDate).getTime() / 1000;
+                    query += ',' + new Date(params.endDate).getTime() / 1000;
+
+                }
+            } else {
+                query += '0,0';
+            }
+
+            query += '&sort=+subscriptionExpireAt';
+
+            return query;
+        }
+
+        function buildTableBody(data) {
+            var $trowTemplate = $('#table-row-template', $subscriptionTableContainer),
+                $trow = $('<tbody/>');
+
+            $.each(data, function (index, item) {
+                $.extend(true, item, {'index': index + 1}); // extend one more column for index
+                if (item.subscriptionStartAt) {
+                    item.subscriptionStartAt = new Date(item.subscriptionStartAt * 1000).mmddyyyy();
+                }
+                if (item.subscriptionExpireAt == 0) {
+                    item.subscriptionExpireAt = 'Never Expired';
+                } else {
+                    item.subscriptionExpireAt = new Date(item.subscriptionExpireAt * 1000).mmddyyyy();
+                }
+
+                var $row = $('<tr/>').loadTemplate($trowTemplate, item);
+                $trow.append($row);
+            });
+
+            return $trow;
+        }
+
+        return {
+            init: init
+        };
+    })();
+
+})(jQuery);

@@ -1,0 +1,24 @@
+#!/bin/bash
+
+NAME="css-compiler"
+STYLES_DIR="../public/wp-content/themes/iwitness/css"
+SCSS_DIR="scss"
+CSS_DIR="compiled"
+
+cd `dirname $0`
+cd $STYLES_DIR
+
+case $1 in
+  watch)
+    compass watch --debug-info --time --poll
+  ;;
+  build)
+    compass compile --force --no-debug-info --output-style compressed
+  ;;
+  clean)
+    compass clean
+  ;;
+  *)
+    echo "USAGE: ${NAME} [watch|build|clean]"
+  ;;
+esac

@@ -1,0 +1,89 @@
+<?php
+$events = $view_model['events'];
+$page_info = isset($view_model['page_info']) ? $view_model['page_info'] : array();
+$user = $view_model['user'];
+$timezone = !empty($user->timezone)
+    ? $user->timezone
+    : (!empty(get_option('timezone_string'))
+        ? get_option('timezone_string')
+        : current(DateTimeZone::listIdentifiers(DateTimeZone::UTC)));
+$tz = new DateTimeZone($timezone);
+?>
+
+<?php do_action('iwitness_print_notices'); ?>
+
+<h2>Events</h2>
+<p class="lead">Manage Your iWitness Account</p>
+<hr>
+
+<h5>Account: <?= wp_get_current_user()->data->display_name ?></h5>
+
+<p>
+    To review any iWitness transmissions that you have made, click the appropriate event on the right.
+</p>
+
+<p>
+    To edit your profile or contacts, simply click the corresponding link at the top of the page.
+</p>
+
+<h6>
+    <strong>
+        NEVER ATTEMPT TO TAKE THE LAW INTO YOUR OWN HANDS. INFORM THE POLICE IMMEDIATELY ABOUT ANY THREATENING
+        SITUATION.
+    </strong>
+</h6>
+
+<div class="row">
+    <?php foreach ($events as $i => $event): ?>
+    <?php
+
+    $id = isset($event['id']) ? $event['id'] : '';
+    $display_name = isset($event['displayName']) ? $event['displayName'] : "&nbsp;";
+    $image_url = isset($event['imageUrl']) ? $event['imageUrl'] : get_bloginfo('template_directory') . '/images/alert.png';
+    $created = isset($event['created']) ? $event['created'] : "";
+
+    $date = new DateTime();
+    $date->setTimestamp($created);
+    $date->setTimezone($tz);
+
+    ?>
+        <?php if (($i) % 3 == 0): ?>
+            </div>
+            <div class="row">
+        <?php endif; ?>
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+            <div class="event">
+                <div class="panel panel-default widget">
+                    <div class="panel-body">
+                        <a href="<?php echo iwitness_get_page_path(IWITNESS_PAGE_EVENT_VIEW_ID); ?>?id=<?php echo $id ?>">
+                            <img src="<?php echo $image_url ?>" alt="" class="img-responsive"
+                                 onerror="this.src='<?php echo get_bloginfo('template_directory') . '/images/alert.png'; ?>'"
+                                 data-src="holder.js/100%x180" style="height: 200px; width: 100%; display: block;" />
+                        </a>
+                        <p><?php echo $date->format("M d, Y") ?></p>
+                        <p>TIME: <?php echo $date->format("g:i:s A") ?> *</p>
+                        <p><?php echo $display_name ?></p>
+                    </div>
+                    <div class="panel-footer">
+                        <a class="btn btn-primary btn-block" href="<?php echo iwitness_get_page_path(IWITNESS_PAGE_EVENT_VIEW_ID); ?>?id=<?php echo $id ?>">VIEW</a>
+                        <form action="" method="POST" role="form">
+                            <input type="hidden" name="id" value="<?php echo $id; ?>">
+                            <button type="submit" class="btn btn-primary btn-sx btn-block" name="action"
+                                    value="iwitness_do_delete_event">Delete
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <?php endforeach; ?>
+
+</div>
+
+<?php iwitness_pager($page_info, iwitness_get_page_path(IWITNESS_PAGE_EVENT_LIST_ID)); ?>
+
+<div class="small">
+    * Date and time are shown for <strong><?= $timezone ?></strong> timezone. <a href="<?php echo iwitness_get_page_path(IWITNESS_PAGE_USER_PROFILE_EDIT_ID); ?>">Change
+        timezone...</a>
+</div>

@@ -1,0 +1,272 @@
+<?php
+
+if (!defined('ABSPATH')) {
+    exit; // Exit if accessed directly
+}
+
+class iWitness_Form_Purchase_Handler
+{
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        add_action('init', array($this, 'iwitness_do_place_your_order'));
+        add_action('init', array($this, 'iwitness_do_use_promo_code'));
+    }
+
+    /**
+     * Process purchase order
+     */
+    public function  iwitness_do_place_your_order()
+    {
+        try {
+            if (!iwitness_validate_submit('iwitness_do_place_your_order', false)) {
+                return;
+            }
+
+            self::validate_subscription_extendable_permission();
+
+            $phone_model = iwitness_get_post_field_value('phone_model');
+            $plan = iwitness_get_post_field_value('plan');
+            $card_num = iwitness_get_post_field_value('card_num');
+            $exp_month = iwitness_get_post_field_value('exp_month');
+            $exp_year = iwitness_get_post_field_value('exp_year');
+            $card_code = iwitness_get_post_field_value('card_code');
+            $first_name = iwitness_get_post_field_value('first_name');
+            $last_name = iwitness_get_post_field_value('last_name');
+            $address = iwitness_get_post_field_value('address');
+            $address2 = iwitness_get_post_field_value('address2');
+            $city = iwitness_get_post_field_value('city');
+            $state = iwitness_get_post_field_value('state');
+            $zip = iwitness_get_post_field_value('zip');
+            $country = iwitness_get_post_field_value('country');
+            $phone = iwitness_get_post_field_value('originalPhone');
+            $formatted_phone = iwitness_get_post_field_phone_number('originalPhone');
+            $cardType = iwitness_get_post_field_value('cardtype');
+            $promo_code = iwitness_get_post_field_value('promoCode');
+            $nonce = iwitness_get_post_field_value('iwitness_renew_nonce', false, '');
+
+            //for buy  gift card
+            $senderName = iwitness_get_post_field_value('sender_name');
+            $senderEmail = iwitness_get_post_field_value('sender_email');
+            $senderVerifyEmail = iwitness_get_post_field_value('sender_verify_email');
+
+            $recipients = !empty($_POST['recipients']) ? $_POST['recipients'] : '';
+
+            if ($plan == 'giftplanyear') {
+                if (empty($recipients)) {
+                    iwitness_add_notice('Please add at least one recipient', 'error');
+                }
+                if (empty($senderName)) {
+                    iwitness_add_notice('Please enter sender name', 'error');
+                }
+                if (empty($senderEmail)) {
+                    iwitness_add_notice('Please enter sender email', 'error');
+                }
+
+                $recipientArray = json_decode(stripcslashes($recipients), true);
+                if (count($recipientArray) <= 0) {
+                    iwitness_add_notice('Please add at least one recipient', 'error');
+                } else {
+                    //format date to unix timestamp
+                    for ($i = 0; $i < count($recipientArray); $i++) {
+                        if (isset($recipientArray[$i]['deliveryDate'])) {
+                            $new_date = DateTime::createFromFormat("m/d/Y", $recipientArray[$i]['deliveryDate']);
+                            $recipientArray[$i]['deliveryDate'] = $new_date->getTimestamp();
+                        } else {
+                            iwitness_add_notice('Invalid delivery date ', 'error');
+                        }
+                    }
+                }
+            }
+
+            //map to subscription request object
+            $data = array(
+                'originalPhone' => $formatted_phone,
+                'originalPhoneModel' => $phone_model,
+                'plan' => $plan,
+                'cardType' => $cardType,
+                'cardNum' => $card_num,
+                'expMonth' => $exp_month,
+                'expYear' => $exp_year,
+                'cardCode' => $card_code,
+                'firstName' => $first_name,
+                'lastName' => $last_name,
+                'address1' => $address,
+                'address2' => $address2,
+                'city' => $city,
+                'state' => $state,
+                'zip' => $zip,
+                'country' => $country,
+                'customerIp' => iwitness_get_the_user_ip(),
+                'senderName' => $senderName,
+                'senderEmail' => $senderEmail,
+            );
+
+            //set if any
+            if (!empty($promo_code)) {
+                $data['promoCode'] = $promo_code;
+            }
+
+            if (isset($recipientArray)) {
+                $data['recipients'] = $recipientArray;
+            }
+
+            //check is renew account
+            $is_renew = false;
+            if (!empty($nonce)) {
+                if (!iwitness_is_api_user()) {
+                    iwitness_add_notice('Couldn\'t process your submission because you are not a subscriber ', 'error');
+                } else {
+                    $session = iWitness()->session();
+                    $session_nonce = $session['iwitness_renew_nonce'];
+                    if ($nonce != $session_nonce) {
+                        iwitness_add_notice('Couldn\'t process your submission because your nonce does not match ', 'error');
+                    } else {
+                        $is_renew = true;
+                    }
+                }
+            }
+            if ($is_renew) {
+                $data['isRenew'] = true;
+            }
+
+            if (iwitness_notice_count('error') == 0) {
+                $response = iwitness_api_post('/subscription', array('body' => $data));
+                //store data into session
+                $session = iWitness()->session();
+                $session['subscriptionUuid'] = $response['id'];
+                $session['originalPhone'] = $phone;
+
+                //buy gift cards
+                if ($plan == 'giftplanyear') {
+                    $id = rand(1, 1000);
+                    $session['recipients_' . $id] = $recipientArray;
+                    wp_redirect(add_query_arg(array('id' => $id), iwitness_get_page_path(IWITNESS_CONGRATULATION_ID)));
+                    exit;
+                }
+
+                if (!empty($promo_code)) {
+                    iwitness_add_notice('Your promo code has been accepted! Create your profile now.', 'success');
+                } else {
+                    iwitness_add_notice('Your payment has been accepted! Create your profile now.', 'success');
+                }
+
+                if (is_user_logged_in()) {
+                    wp_redirect(iwitness_get_page_path(IWITNESS_PAGE_USER_PROFILE_EDIT_ID));
+                } else {
+                    $buyer_info = array(
+                        'subscriptionUuid' => $response['id'],
+                        'firstName' => $first_name,
+                        'lastName' => $last_name,
+                        'address1' => $address,
+                        'address2' => $address2,
+                        'city' => $city,
+                        'state' => $state,
+                        'zip' => $zip,
+                        'country' => $country,
+                    );
+                    $session['iwitness-buyer-info'] = $buyer_info;
+                    wp_redirect(iwitness_get_page_path(IWITNESS_PAGE_SIGN_UP));
+                }
+                exit;
+            }
+        } catch (Exception $ex) {
+            iwitness_handle_submit_exception($ex);
+        }
+        $data['recipients'] = $recipients;
+        $data['senderVerifyEmail'] = $senderVerifyEmail;
+        $data['iwitness_renew_nonce'] = $nonce;
+        $session = iWitness()->session();
+        $session['subscriptionUuid'] = null;
+        $session['originalPhone'] = null;
+        $_POST['iwitness_do_place_your_order_data'] = $data;
+    }
+
+    /**
+     *
+     */
+    private static function validate_subscription_extendable_permission()
+    {
+        $user = iwitness_get_current_api_user(false);
+        if ($user) {
+            if ($user->isAdmin()) {
+                iwitness_add_notice('Admin users do not allow to buy subscription', 'error');
+            } else if ($user->isFree()) {
+                iwitness_add_notice('Free users do not allow to renew subscription', 'error');
+            } else if ($user->subscriptionExpireAt > (time() - (7 * 24 * 60 * 60))) { // 7 days
+                //todo: not sure wait for Brandon
+                //iwitness_add_notice('Your subscription is not expire', 'error');
+
+            }
+        }
+    }
+
+    /**
+     * Register by promotion code
+     */
+    public function  iwitness_do_use_promo_code()
+    {
+        if (!iwitness_validate_submit('iwitness_do_use_promo_code', false)) {
+            return;
+        }
+
+        $phone_model = iwitness_get_post_field_value('phone_model');
+        $promo_code = iwitness_get_post_field_value('promo_code');
+
+        if (empty($phone_model)) {
+            iwitness_add_notice('Please enter phone model', 'error');
+        }
+
+        if (empty($promo_code)) {
+            iwitness_add_notice('Please enter promotion code', 'error');
+        }
+
+        //map to subscription request object
+        $data = array(
+            'originalPhoneModel' => $phone_model,
+            'promoCode' => $promo_code,
+            'customerIp' => iwitness_get_the_user_ip(),
+        );
+
+        if (iwitness_is_api_user()) {
+            $data['isRenew'] = true;
+        }
+
+        $session = iWitness()->session();
+
+        if (iwitness_notice_count('error') == 0) {
+            try {
+                $response = iwitness_api_post('/subscription', array('body' => $data));
+                //store data into session
+                $session['subscriptionUuid'] = $response['id'];
+                $session['originalPhone'] = null;
+
+                iwitness_add_notice('Your promo code has been accepted! Create your profile now.', 'success');
+
+                $session->write_data();
+
+                if (is_user_logged_in()) {
+                    wp_redirect(iwitness_get_page_path(IWITNESS_PAGE_USER_PROFILE_EDIT_ID));
+                } else {
+                    wp_redirect(iwitness_get_page_path(IWITNESS_PAGE_SIGN_UP));
+                }
+                exit;
+            } catch (Exception $ex) {
+                iwitness_handle_submit_exception($ex);
+            }
+        }
+
+        $session['subscriptionUuid'] = null;
+        $_POST['iwitness_do_use_promo_code_data'] = $data;
+    }
+
+
+}
+
+//end of class
+
+new iWitness_Form_Purchase_Handler();
+

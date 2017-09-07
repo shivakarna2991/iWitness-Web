@@ -1,0 +1,230 @@
+#order {
+
+  h3 {
+    margin-bottom: 20px;
+  }
+
+  .supported-devices {
+    label {
+      display: block;
+      text-align: center;
+    }
+  }
+
+  #iphone3-warning-overlay {
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    top: 100px;
+    left: -15px;
+    position: absolute;
+    padding: 6px;
+    color: #fff;
+    background-color: #df1c18;
+    width: 255px;
+    border-radius: 5px;
+    display: none;
+  }
+
+  .payment {
+    .card-container {
+      position: relative;
+
+      .ccard-icon {
+        position: absolute;
+        display: inline-block;
+        width: 40px;
+        height: 26px;
+        right: 4px;
+        top: 4px;
+      }
+    }
+
+    .card{
+      background: url('./../../images/start-now/ccard.gif') no-repeat;
+    }
+
+    .visa {
+      background: url('./../../images/start-now/card_visa.png') no-repeat;
+    }
+
+    .mastercard {
+      background: url('./../../images/start-now/card_master.png') no-repeat;
+    }
+
+    .amex {
+      background: url('./../../images/start-now/card_amex.png') no-repeat;
+    }
+
+    .discover {
+      background: url('./../../images/start-now/card_discover.png') no-repeat;
+    }
+
+    .jcb {
+      background: url('./../../images/start-now/card_jcb.png') no-repeat;
+    }
+
+    .visa_electron {
+      background: url('./../../images/start-now/card_visa_electron.png') no-repeat;
+    }
+  }
+
+  ul {
+    margin-left: 0;
+    li {
+      list-style-type: none;
+    }
+  }
+}
+
+#main-gift-card-container {
+  .mailerContainer {
+    background-color: #fff;
+    color: #000;
+  }
+
+  .mailerHeader {
+    padding: 20px 30px;
+    height: 70px;
+    border-bottom: 1px solid #000;
+  }
+
+  .mailerHeader p {
+    font-size: 16px;
+  }
+
+  .mailerHeader a {
+    text-decoration: underline;
+  }
+
+  .mailerlog {
+    padding: 10px 0px;
+    border: 1px solid;
+    border-bottom-width: 5px;
+    overflow: hidden;
+  }
+
+  .logotext {
+    padding-left: 0px;
+    float: left;
+  }
+
+  .logotext a {
+    text-decoration: underline;
+  }
+
+  .mailerimg {
+    height: 302px;
+    background-repeat: no-repeat;
+    border-bottom: 5px solid $middleGrey;
+    border-right: 1px solid $middleGrey;
+    border-left: 1px solid $middleGrey;
+  }
+
+  .mailerimg p {
+    padding: 0 0 0 25px;
+    font-size: 18px;
+    line-height: 23px;
+    &.title {
+      margin-top: 35px;
+      font-size: 30px;
+      font-weight: bolder;
+      color: #cb2e1e;
+    }
+  }
+
+  .mailer-gift {
+    border-top: 1px solid $middleGrey;
+    border-right: 1px solid $middleGrey;
+    border-left: 1px solid $middleGrey;
+    border-bottom: 5px solid $darkRed;
+    height: 308px;
+
+    #mailer-text {
+      margin-top: 5px;
+    }
+  }
+
+  .mailerimg a {
+    text-decoration: underline;
+  }
+
+  .mailerTo {
+    padding: 20px 0px 0px 25px;
+    font-size: 18px;
+    line-height: 23px;
+  }
+
+  .mailerTo span {
+    font-size: 13px;
+  }
+
+  .mailerimg4 {
+    height: 582px;
+    background-image: url(../../../images/image4.png);
+    background-repeat: no-repeat;
+  }
+
+  .mailerCommon {
+    overflow: hidden;
+    color: #77787b;
+    padding-left: 30px;
+  }
+
+  .mailerimg3 {
+    height: 296px;
+    background-image: url(../../../images/image3.png);
+    background-repeat: no-repeat;
+  }
+
+  .mailerText2 {
+    height: 270px;
+    padding: 10px 0px 0px 20px;
+    float: left;
+    background-color: #FFF;
+  }
+
+  .mailerText3 {
+    height: 270px;
+  }
+
+  .mailerClaim {
+    font-size: 17px;
+  }
+
+  .mailerClaim span {
+    color: #d7312d;
+    line-height: 17px;
+
+  }
+
+  .mailerlink {
+    font-size: 11px;
+  }
+
+  .mailerlink span {
+    color: #092ecf;
+
+  }
+
+  .mobileline {
+    font-size: 15px;
+    font-weight: bold;
+    clear: both;
+    padding-left: 5px;
+  }
+
+  .sample {
+    margin-left: 5px;
+
+    .form-group {
+      background-color: $white;
+    }
+  }
+}
+
+// fixed alignment for error in center of order forms
+#step2 {
+  label.error {
+    display: block;
+  }
+}

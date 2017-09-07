@@ -1,0 +1,121 @@
+;
+(function ($) {
+    "use strict";
+
+    $().ready(function () {
+        RevenueReport.init();
+    });
+
+    var RevenueReport = (function () {
+
+        var $revenueTableContainer = $('#revenue-table-container'),
+            $revenueTable = $revenueTableContainer.find('table'),
+            $startDate = $('#start-date'),
+            $endDate = $('#end-date'),
+            $search = $('#search');
+
+        function init() {
+            // binding date pickers
+            bindDatePickers();
+
+            // binding user table
+            $revenueTableContainer.iwBindingTable();
+
+            // binding search event
+            bindSearch();
+        }
+
+        function bindDatePickers() {
+            $startDate.datepicker({
+                changeMonth: true,
+                changeYear: true,
+                onSelect: function (selected) {
+                    $endDate.datepicker("option", "minDate", selected)
+                }
+            });
+
+            $endDate.datepicker({
+                changeMonth: true,
+                changeYear: true,
+                onSelect: function (selected) {
+                    $startDate.datepicker("option", "maxDate", selected)
+                }
+            });
+        }
+
+        function bindSearch() {
+            $search.on('click', function (e) {
+                e.preventDefault();
+
+                if($startDate.val() != '' && $endDate.val() != '') {
+                    getRemoteData({
+                        'startDate': $startDate.val(),
+                        'endDate': $endDate.val()
+                    });
+                } else {
+                    getRemoteData();
+                }
+            });
+        }
+
+        function getRemoteData($params) {
+            $(this)
+                .iwGetRemoteData(buildSearchQuery($params))
+                .done(function (data) {
+                    $revenueTable.find("tbody").find('tr').remove(); // remove old data first
+                    if(data != undefined && data.details.length > 0) {
+                        var body = buildTableBody(data.details),
+                            $totalSummary = $('#total-summary', $revenueTable),
+                            $totalRevenue = $('#total-revenue', $revenueTable),
+                            totalRevenue = data.totalRevenue,
+                            totalRegister = data.totalRegister;
+
+                        $('#no-record').addClass('hide');
+                        $revenueTable.find("tbody").append($(body).find('tr'));
+
+                        // processing footer for summarize data
+                        $revenueTable.find('tfoot').removeClass('hide');
+                        $totalSummary.html(totalRegister + ' registered');
+                        $totalRevenue.html('$ ' + totalRevenue);
+                    } else {
+                        $revenueTable.find('tfoot').addClass('hide');
+                        $('#no-record').removeClass('hide');
+                    }
+
+                    $revenueTable.trigger("update");
+                });
+        }
+
+        function buildSearchQuery(params) {
+            var query = '/subscription/report/revenue';
+            if (params != undefined) {
+                if (params.startDate != undefined && params.endDate != undefined) {
+                    query += '/' + new Date(params.startDate).getTime() / 1000;
+                    query += '/' + new Date(params.endDate).getTime() / 1000;
+                }
+            } else {
+                query += '/0/0';
+            }
+
+            return query;
+        }
+
+        function buildTableBody(data) {
+            var $trowTemplate = $('#table-row-template', $revenueTableContainer),
+                $trow = $('<tbody/>');
+
+            $.each(data, function (index, item) {
+                $.extend(true, item, {'index': index + 1}); // extend one more column for index
+                var $row = $('<tr/>').loadTemplate($trowTemplate, item);
+                $trow.append($row);
+            });
+
+            return $trow;
+        }
+
+        return {
+            init: init
+        };
+    })();
+
+})(jQuery);

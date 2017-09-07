@@ -1,0 +1,27 @@
+<h2>Learn More</h2>
+<p class="lead"><strong>iWitness offers a combination of features unmatched</strong> by any other self-protection product or service.</p>
+<hr>
+
+<div class="row">
+    <div class="col-md-5">
+        <div class="buttons text-center"><a class="wistia-popover[width=640,height=360,playerColor=#636155]" href="http://fast.wistia.com/embed/iframe/f78c7de7ec?version=v1&amp;videoWidth=640&amp;videoHeight=360&amp;controlsVisibleOnLoad=true&amp;autoPlay=true&amp;popover=v1">
+            <img class="alignnone size-medium wp-image-113" src="http://wordpress.hung.dev-vn.webonyx.local/wp-content/uploads/2014/06/splash-300x170.jpg" alt="Play Video" align="middle" />
+        </a>
+            <a id="launch-player2" class="wistia-popover[width=640,height=360,playerColor=#636155]" href="http://fast.wistia.com/embed/iframe/f78c7de7ec?version=v1&amp;videoWidth=640&amp;videoHeight=360&amp;controlsVisibleOnLoad=true&amp;autoPlay=true&amp;popover=v1">
+            </a></div>
+        <div class="buttons text-center"><a class="btn btn-default" href="/content-how-it-works">How it Works</a> <a class="btn btn-primary" href="/start-now">Buy Now</a></div>
+    </div>
+    <div class="col-md-7">
+        <ul class="facts">
+            <li>Only service that offers audio and video recording</li>
+            <li>Real-time tracking of your location via GPS</li>
+            <li>Data sent to a secure off-premises server location</li>
+            <li>Automatically dials 911(Android users simply tap "Call" on their display)</li>
+            <li>Notifies trusted contacts when you feel endangered</li>
+            <li>Emits flashing light and sounds an alarm</li>
+            <li>Allows you to manage your recordings</li>
+        </ul>
+    </div>
+</div>
+
+<script src="http://fast.wistia.com/static/popover-v1.js" charset="ISO-8859-1"></script>

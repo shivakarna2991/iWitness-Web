@@ -1,0 +1,77 @@
+<?php
+if (!defined('PENDING')) define('PENDING', 1);
+if (!defined('ACCEPTED')) define('ACCEPTED', 2);
+if (!defined('DECLINED')) define('DECLINED', 4);
+
+
+/**
+ * @return array
+ */
+function iwitness_api_contact_get_by_current_user()
+{
+    $token = iwitness_get_current_user_access_token();
+    $headers = array_merge(array('Content-Type' => 'application/json'));
+    $response = iwitness_api_get('/user/' . $token->user_id . '/contact?fields=flags', array('headers' => $headers, 'data' => array()));
+    return isset($response['_embedded']['contact']) ? $response['_embedded']['contact'] : array();
+}
+
+/**
+ * @internal param $user
+ * @return array
+ */
+function iwitness_api_contact_report_for_current_user()
+{
+    //no worry, it maximun is 6
+    $result = iwitness_api_contact_get_by_current_user();
+    $total = 0;
+    $accepted = 0;
+    $pending = 0;
+    $declined = 0;
+
+    foreach ($result as $contact) {
+        $total++;
+        switch ($contact['flags']) {
+            case PENDING:
+                $pending++;
+                break;
+            case ACCEPTED:
+                $accepted++;
+                break;
+            case DECLINED:
+                $declined++;
+                break;
+        }
+    }
+    return array(
+        'total' => $total,
+        'accepted' => $accepted,
+        'pending' => $pending,
+        'declined' => $declined
+    );
+}
+
+
+/**
+ * @param $token
+ * @return array
+ */
+function iwitness_validate_friend_connect_token($token)
+{
+    $isValidToken = false;
+    $message = '';
+    $contact = array();
+    try {
+        if (empty($token)) {
+            $message = 'Token could not be null';
+        } else {
+			$result = iwitness_api_get('/contact/validate/token/' . $token);
+            if (isset($result['contact'])) {
+                $contact = $result['contact'];
+            }
+            $isValidToken = true;
+        }
+    } catch (\Exception $ex) {
+        $message = $ex->getMessage();
+    }
+    return array($isValidToken, $message, $contact);
+}

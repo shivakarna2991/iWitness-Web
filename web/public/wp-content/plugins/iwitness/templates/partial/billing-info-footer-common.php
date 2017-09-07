@@ -1,0 +1,40 @@
+<div class="form-group">
+    <label for="phone" class="col-md-2 control-label">Wireless Number</label>
+
+    <div class="col-md-7">
+        <input type="text" name="originalPhone" class="wireless-phone required form-control"
+               value="<?= $view_model['originalPhone'] ?>"
+               placeholder="e.g. 12345678900"/>
+
+        <p class="help-block">
+            A link to download the app will be sent to this number.
+        </p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <?php /* Why is this crap displayed on this page?
+        <p>Upon placing your order, a text message will be sent to the phone you will be using.</p>
+        <h6>Next Steps</h6>
+        <ul>
+            <li>- Go to the Apple App Store or Android Google Play</li>
+            <li>- Download the iWitness App</li>
+            <li>- Enter your phone number and password</li>
+            <li>- Set up your account</li>
+        </ul>
+        */ ?>
+    </div>
+    <div class="col-md-4">
+    </div>
+</div>
+<hr>
+<p class="text-right">
+    <button id="next" type="button" class="btn btn-primary">Next &gt;</button>
+</p>
+
+<?php if(!isset($view_model['iwitness_renew_nonce'])) $view_model['iwitness_renew_nonce'] = ''; ?>
+
+<input type="hidden" name="iwitness_renew_nonce"
+       value="<?php echo $view_model['iwitness_renew_nonce'] ?>"/>
+

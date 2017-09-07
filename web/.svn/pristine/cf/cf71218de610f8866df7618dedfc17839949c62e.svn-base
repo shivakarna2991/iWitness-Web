@@ -1,0 +1,240 @@
+<?php
+/**
+ * Handler all POST actions in the client side
+ *
+ * @author      iWitness
+ * @category    FormHandler
+ * @package     iWitness/FormHandler
+ * @version     1.0
+ */
+
+if (!defined('ABSPATH')) exit; // Exit if accessed directly
+if (!class_exists('iWitness_Admin_Form_Handler')) :
+
+    class iWitness_Admin_Form_Handler
+    {
+        const SUSPEND = 1;
+
+        /**
+         * Constructor
+         */
+        public function __construct()
+        {
+            add_action('init', array($this, 'do_promotion_code'));
+            add_action('init', array($this, 'do_send_notification'));
+            add_action('init', array($this, 'iwitness_do_save_api_url'));
+        }
+
+        /**
+         * Process promotion creating form
+         */
+        public function  do_promotion_code()
+        {
+            if (!iwitness_validate_submit('do_promotion_code', true) || !iwitness_is_api_admin_user()) {
+                return;
+            }
+
+            $promotion_name = iwitness_get_post_field_value('promotion_name');
+            $single = iwitness_get_post_field_value('single');
+            $promotion_code = iwitness_get_post_field_value('promotion_code');
+            $number_of_code = iwitness_get_post_field_value('number_of_code');
+            $max_redemption = iwitness_get_post_field_value('max_redemption');
+            $start_date = iwitness_get_post_field_value('datepicker_start_date');
+            $end_date = iwitness_get_post_field_value('datepicker_end_date');
+            $subscription_length = iwitness_get_post_field_value('subscription_length');
+            $price = iwitness_get_post_field_value('price');
+            $code_string = iwitness_get_post_field_value('code_string');
+            $plan = iwitness_get_post_field_value('plan');
+
+            if (empty($promotion_name)) {
+                iwitness_add_notice('Please enter promotion name', 'error');
+            }
+
+            if (empty($promotion_code)) {
+                iwitness_add_notice('Please enter promotion code', 'error');
+            }
+
+            if (($single == 'option2') && empty($number_of_code)) {
+                iwitness_add_notice('Please enter number of code', 'error');
+            }
+
+            if (empty($max_redemption)) {
+                iwitness_add_notice('Please enter Max redemptions', 'error');
+            }
+
+            /*
+            if (empty($start_date)) {
+                iwitness_add_notice('Please enter Redemption Start Date', 'error');
+            }
+
+            if (empty($end_date)) {
+                iwitness_add_notice('Please enter Redemption End Date', 'error');
+            }
+            if (empty($subscription_length)) {
+                iwitness_add_notice('Please enter Length of Subscription', 'error');
+            }
+             * if (empty($price)) {
+             * iwitness_add_notice('Please enter Prize', 'error');
+             * }
+             */
+
+            $formatted_start_date = iwitness_get_unix_time_stamp($start_date);
+            $formatted_end_date = iwitness_get_unix_time_stamp($end_date);
+
+            if (!empty($birth_date)) {
+                $birth_date = trim($birth_date);
+                $new_date = DateTime::createFromFormat("m/d/Y", $birth_date);
+                $unix_time = $new_date->getTimestamp();
+                $data['birthDate'] = $unix_time;
+            }
+
+            $data = array(
+                'name' => $promotion_name,
+                'code' => $promotion_code,
+                'maxRedemption' => $max_redemption,
+                'isActive' => true,
+                'price' => $price,
+                'subscriptionLength' => $subscription_length,
+                'plan' => $plan,
+
+            );
+
+            if ($formatted_start_date > 0) {
+                $data['redemptionStartDate'] = $formatted_start_date;
+            }
+
+            if ($formatted_end_date > 0) {
+                $data['redemptionEndDate'] = $formatted_end_date;
+            }
+
+
+            if (intval($number_of_code) > 0) {
+                $data['numberOfCode'] = $number_of_code;
+            }
+
+            if (iwitness_notice_count('error') == 0) {
+                try {
+                    $response = iwitness_api_post('/coupon', array('body' => $data));
+                    //store data into session
+                    $session = iWitness()->session();
+                    $session['iwitness_code_string'] = $response['codeString'];
+                    wp_redirect(iwitness_get_page_path(IWITNESS_PAGE_PROMO_CODE_LIST_ID) . '?code=' . $response['codeString']);
+                    exit;
+                } catch (Exception $ex) {
+                    iwitness_log_error($ex);
+                    iwitness_add_api_exception_to_notice($ex);
+                }
+            }
+
+            $data['single'] = $single;
+            $data['codeString'] = $code_string;
+            $data['numberOfCode'] = $number_of_code;
+            $data['redemptionStartDate'] = $start_date; //back to original
+            $data['redemptionEndDate'] = $end_date;
+            $_POST['iwitness_do_promotion_code_data'] = $data;
+        }
+
+        /**
+         * Admin Send Notification message to user action
+         */
+        public function do_send_notification()
+        {
+            iwitness_do_form_action(
+                'do_send_notification',
+                function () {
+                    // get data from the form
+                    $ids = iwitness_get_post_field_value('select2-user-id');
+                    $message = iwitness_get_post_field_value('message');
+
+                    // do validation
+                    iwitness_show_empty_error_message($message, 'Message');
+                    foreach (explode(',', $ids) as $id) {
+                        if ($id) {
+                            iwitness_show_empty_error_message($id, 'User id');
+                        }
+                    }
+
+                    // build data model
+                    return array(
+                        'message' => $message,
+                        'ids' => $ids
+                    );
+                },
+                function ($data) {
+
+                    $response = iwitness_api_post('/message',
+                        array('body' => array(
+                            'userIds' => explode(',', $data['ids']),
+                            'message' => $data['message'])
+                        )
+                    );
+                    iwitness_add_notice('Message has been sent to user(s)', 'success');
+                    wp_redirect(IWITNESS_PAGE_NOTIFICATION_ID);
+                    exit;
+                }
+            );
+        }
+
+        /**
+         * Doing save the iwitness option setting page
+         */
+        public function iwitness_do_save_api_url()
+        {
+            // validate action
+            if ('POST' !== strtoupper($_SERVER['REQUEST_METHOD'])) {
+                return false;
+            }
+
+            if (empty($_POST['action']) || ('iwitness_do_save_api_url' !== $_POST['action'])) {
+                return false;
+            }
+
+            try {
+                // get data from the form
+                $api_url = iwitness_get_post_field_value('api_site_url');
+                $num_of_contact_on_page = absint(iwitness_get_post_field_value('num_of_contact_on_page')); //make sure the result is non-negative
+
+                // do validation
+                if (!$api_url ||
+                    empty($api_url) ||
+                    !filter_var($api_url, FILTER_VALIDATE_URL)
+                ) {
+                    return new WP_Error('api_site_url', __('API Url is not a valid url'));
+                }
+
+                if (!$num_of_contact_on_page || empty($num_of_contact_on_page)) {
+                    return new WP_Error('num_of_contact_on_page', __('Num of contact cannot be empty'));
+                }
+
+                // settings for API Server Url
+                if (get_option(IWITNESS_API_URL_OPTION)  !== false) {
+                    // The option already exists, so we just update it.
+                    update_option(IWITNESS_API_URL_OPTION, $api_url);
+                } else {
+                    // The option hasn't been added yet. We'll add it with $autoload set to 'no'.
+                    $deprecated = null;
+                    $autoload = 'no';
+                    add_option(IWITNESS_API_URL_OPTION, $api_url, $deprecated, $autoload);
+                }
+
+                // settings for number of contact on page
+                if (get_option(IWITNESS_NUM_CONTACT_ON_PAGE_OPTION) !== false) {
+                    update_option(IWITNESS_NUM_CONTACT_ON_PAGE_OPTION, $num_of_contact_on_page);
+                } else {
+                    $deprecated = null;
+                    $autoload = 'no';
+                    add_option(IWITNESS_NUM_CONTACT_ON_PAGE_OPTION, $num_of_contact_on_page, $deprecated, $autoload);
+                }
+
+                wp_redirect(admin_url());
+                exit;
+            } catch (Exception $ex) {
+                iwitness_log_error($ex);
+                iwitness_add_api_exception_to_notice($ex);
+            }
+        }
+
+    }
+endif;
+
+new iWitness_Admin_Form_Handler();

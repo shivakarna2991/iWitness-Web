@@ -1,0 +1,56 @@
+<div class="foot">
+    <div class="container">
+
+        <ul class="list-inline">
+            <li>
+                <a href="/content-news">News</a>
+            </li>
+            <li>|</li>
+            <li>
+                <a href="/content-about">About</a>
+            </li>
+            <li>|</li>
+            <li>
+                <a href="/content-contact">Contact</a>
+            </li>
+            <li>|</li>
+            <li>
+                <a href="/content-faq">FAQ</a>
+            </li>
+            <li>|</li>
+            <?php /*
+            <li>
+                <a href="/tell-a-friend">Tell-A-Friend</a>
+            </li>
+            <li>|</li>
+            */ ?>
+            <li>
+                <a href="/content-crime-stats">Crime Stats</a>
+            </li>
+            <li>|</li>
+            <li>
+                <a href="/content-how-it-works">How it Works</a>
+            </li>
+            <li>|</li>
+            <li>
+                <a href="/content-terms-of-use">Terms of Use</a>
+            </li>
+            <li>|</li>
+            <li>
+                <a href="/content-user-agreement">End User License</a>
+            </li>
+            <li>|</li>
+            <li>
+                <a href="/content-terms-of-service">Terms of Service</a>
+            </li>
+            <li>|</li>
+            <li>
+                <a href="<?php echo IWITNESS_PAGE_HOME; ?>/gift-card">Gift Card</a>
+            </li>
+        </ul>
+        <p>
+            Copyright &copy; <?= date('Y'); ?> iWitness All rights reserved.
+        </p>
+
+    </div>
+</div>

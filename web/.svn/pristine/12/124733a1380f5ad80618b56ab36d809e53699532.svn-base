@@ -1,0 +1,121 @@
+<?php
+/**
+ * Load assets.
+ *
+ * @author      iWitness
+ * @category    Asset
+ * @package     iWitness/Asset
+ * @version     1.0
+ */
+
+if (!defined('ABSPATH')) exit; // Exit if accessed directly
+if (!class_exists('iWitness_Assets')) :
+
+    /**
+     * iWitness_Assets Class
+     */
+    class iWitness_Assets
+    {
+        /**
+         * Constructor
+         */
+        public function __construct()
+        {
+            add_action('wp_enqueue_scripts', array($this, 'add_script_libraries'));
+        }
+
+        /**
+         *   Add the core scripts
+         *
+         */
+        public function add_script_libraries()
+        {
+            $plugin_path = iWitness()->plugin_url() . '/assets';
+
+            // core script plugins
+            wp_register_script('bootstrap-plugin', $plugin_path . '/js/sass-bootstrap.min.js', array('jquery'));
+            wp_register_script('jquery-hashchange-plugin', $plugin_path . '/js/jquery/jquery.ba-hashchange.min.js', array('jquery'));
+            wp_register_script('jquery-validation-plugin', $plugin_path . '/js/jquery-validation-1.12.0/jquery.validate.min.js', array('jquery'));
+            wp_register_script('jquery-validation-ext-plugin', $plugin_path . '/js/jquery-validation-1.12.0/additional-methods.min.js', array('jquery', 'jquery-validation-plugin'));
+            wp_register_script('jquery-metadata-plugin', $plugin_path . '/js/jquery/jquery.metadata.js', array('jquery'));
+            wp_register_script('jquery-block-ui-plugin', $plugin_path . '/js/jquery/jquery.blockUI.js', array('jquery'));
+
+            wp_register_script('jquery-credit-card-validator', $plugin_path . '/js/jquery.creditCardValidator.js', array('jquery'));
+
+            //jquery from
+            wp_register_script('jquery-form-plugin', $plugin_path . '/js/jquery.form/jquery.form.min.js', array('jquery', 'jquery-validation-plugin'));
+
+
+            // validation scripts
+            wp_register_script('jquery-ui', 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js', false, '1.10.4');
+            wp_register_style('jquery-ui-css', 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css');
+
+            // plupload scripts
+            wp_register_script('plupload', $plugin_path . '/js/plupload-2.1.2/plupload.full.min.js', array('jquery'));
+
+            // select2 component scripts
+            wp_register_script('select2-plugin', $plugin_path . '/js/select2/select2.min.js', array('jquery'));
+            wp_register_style('select2-css-plugin', $plugin_path . '/js/select2/select2.css');
+            wp_register_style('select2-css-bs-plugin', $plugin_path . '/js/select2/select2-bootstrap.css');
+
+            // utilities scripts
+            wp_register_script('jwplayer-plugin', $plugin_path . '/js/jwplayer/jwplayer.js', array());
+            wp_register_script('google-map-plugin', 'http://maps.googleapis.com/maps/api/js?sensor=true', false);
+
+            // jquery template
+            wp_register_script('jquery-template-script-plugin', $plugin_path . '/js/jquery-loadTemplate/jquery.loadTemplate-1.4.4.min.js', array('jquery'));
+
+            // infinite scroll
+            wp_register_script('infinite-scroll-plugin', $plugin_path . '/js/infinite-scroll/jquery.infinitescroll.js', array('jquery'));
+
+            // jquery table sorter
+            wp_register_script('jquery-table-sorter-script-plugin', 'http://mottie.github.io/tablesorter/js/jquery.tablesorter.js', array('jquery'));
+            wp_register_script('jquery-table-sorter-pager-script-plugin', 'http://mottie.github.io/tablesorter/addons/pager/jquery.tablesorter.pager.js', array('jquery'));
+            wp_register_script('jquery-table-sorter-widget-script-plugin', 'http://mottie.github.io/tablesorter/js/jquery.tablesorter.widgets.js', array('jquery'));
+            wp_register_script('jquery-table-sorter-col-selector-widget-script-plugin', $plugin_path . '/js/jquery.tablesorter/widgets/widget-columnSelector.js', array('jquery'));
+
+            // our script plugins
+            wp_register_script('iwitness-common-plugin', $plugin_path . '/js/iwitness/common.js', array('jquery'));
+            wp_register_script('iwitness-jquery-plugin', $plugin_path . '/js/iwitness/jquery.iwitness.js', array('jquery'));
+            wp_register_script('iwitness-jquery-validation-plugin', $plugin_path . '/js/iwitness/jquery.validation.ext.js', array('jquery', 'jquery-validation-plugin'));
+
+            wp_register_script('iwitness-billing-info', $plugin_path . '/js/iwitness/billing-info.js', array('jquery', 'jquery-credit-card-validator'));
+            wp_register_script('iwitness-purchase-plugin', $plugin_path . '/js/iwitness/purchase.js', array('jquery', 'jquery-validation-plugin', 'iwitness-billing-info'));
+            wp_register_script('iwitness-buy-gift-cards', $plugin_path . '/js/iwitness/gift-card.js', array('jquery', 'jquery-validation-plugin', 'iwitness-billing-info'));
+            wp_register_script('iwitness-sign-up-plugin', $plugin_path . '/js/iwitness/sign-up.js', array('jquery', 'jquery-validation-plugin'));
+            wp_register_script('iwitness-profile-edit-plugin', $plugin_path . '/js/iwitness/profile-edit.js', array('jquery', 'jquery-validation-plugin', 'plupload'));
+            wp_register_script('iwitness-event-video-player-plugin', $plugin_path . '/js/iwitness/event-view-video-player.js', array('jquery'));
+            wp_register_script('iwitness-event-google-map-plugin', $plugin_path . '/js/iwitness/event-view-map.js', array('jquery'));
+            wp_register_script('iwitness-user-manage-plugin', $plugin_path . '/js/iwitness/user-manage.js', array('jquery'));
+            wp_register_script('iwitness-promotional-code-plugin', $plugin_path . '/js/iwitness/promotional-code.js', array('jquery', 'jquery-ui', 'iwitness-jquery-validation-plugin'));
+            wp_register_script('iwitness-notification-plugin', $plugin_path . '/js/iwitness/notifications.js', array('jquery', 'select2-plugin', 'iwitness-jquery-validation-plugin'));
+            wp_register_script('iwitness-contact-plugin', $plugin_path . '/js/iwitness/contact.js', array('jquery', 'iwitness-jquery-validation-plugin'));
+
+            // report script
+            wp_register_script('iwitness-user-report-plugin', $plugin_path . '/js/iwitness/user-report.js', array('jquery', 'jquery-template-script-plugin'));
+            wp_register_script('iwitness-user-event-report-plugin', $plugin_path . '/js/iwitness/user-event-report.js', array('jquery', 'jquery-template-script-plugin'));
+            wp_register_script('iwitness-revenue-report-plugin', $plugin_path . '/js/iwitness/revenue-report.js', array('jquery', 'jquery-template-script-plugin'));
+            wp_register_script('iwitness-subscription-report-plugin', $plugin_path . '/js/iwitness/subscription-report.js', array('jquery', 'jquery-template-script-plugin'));
+
+            // enqueue core plugins
+            wp_enqueue_script('jquery');
+            wp_enqueue_script('bootstrap-plugin');
+            wp_enqueue_script('jquery-hashchange-plugin');
+            wp_enqueue_script('jquery-validation-plugin');
+            wp_enqueue_script('jquery-validation-ext-plugin');
+            wp_enqueue_script('jquery-metadata-plugin');
+            wp_enqueue_script('jquery-block-ui-plugin');
+            wp_enqueue_script('jquery-template-script-plugin');
+            wp_enqueue_script('infinite-scroll-plugin');
+
+            // iwitness core registration
+            wp_enqueue_script('iwitness-common-plugin');
+            wp_enqueue_script('iwitness-jquery-plugin');
+            wp_enqueue_script('iwitness-jquery-validation-plugin');
+        }
+
+    }
+
+endif;
+
+new iWitness_Assets();

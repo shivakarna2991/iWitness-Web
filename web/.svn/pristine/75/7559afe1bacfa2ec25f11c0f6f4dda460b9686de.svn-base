@@ -1,0 +1,205 @@
+<?php
+
+/**
+ * Adds prefix and suffix to given value if not empty,
+ * otherwise returns empty string
+ *
+ * @param string $prefix
+ * @param $value
+ * @param string $suffix
+ * @return type
+ */
+function iwitness_view_helper_decorate($prefix, $value, $suffix = '')
+{
+    if ('' !== (string)$value) {
+        return $prefix . $value . $suffix;
+    }
+    return '';
+}
+
+
+/**
+ * Formats phone number from normalized international form to human-friendly
+ *
+ * Normalized form example: 17525856424 (without +)
+ * Human-friendly example
+ *     for US: 752-585-6424
+ *     for other countries: +1-752-585-6424
+ *
+ * @param string $phone
+ * @return mixed|string
+ */
+function iwitness_view_helper_format_phone($phone)
+{
+    if (strlen($phone) < 10) {
+        return $phone;
+    }
+
+    // make sure that valid int'l phone number
+    $phone = iwitness_view_helper_format_intl_phone($phone);
+    $length = strlen($phone);
+    if ($length <= 0) {
+        return '';
+    }
+
+    $human = substr($phone, $length - 10, 3) . '-'
+        . substr($phone, $length - 7, 3) . '-'
+        . substr($phone, $length - 4);
+
+    if ('1' === $phone[0] && $length <= 11) {
+        return $human; // US
+    }
+
+    return '+' . substr($phone, 0, $length - 10) . '-' . $human;
+}
+
+/**
+ * Transforms phone number from human-friendly format to international format
+ *
+ * @param string $phone
+ * @return mixed|string
+ */
+function iwitness_view_helper_format_intl_phone($phone)
+{
+    $norm = preg_replace('~[^0-9]~', '', $phone);
+
+    if (10 === strlen($norm)) {
+        return '1' . $norm; // US
+    }
+
+    return $norm;
+}
+
+/**
+ * Adds prefix and suffix to given value if not empty,
+ * otherwise returns empty string
+ *
+ * @param $count
+ * @param $singular
+ * @param null $plural
+ * @return type
+ */
+function iwitness_view_helper_pluralize($count, $singular, $plural = null)
+{
+    if (null === $plural) {
+        $plural = $singular . 's';
+    }
+    return intval($count) == 1 ? $singular : $plural;
+}
+
+/**
+ * @param array $options
+ * @param $selected
+ */
+function iwitness_view_helper_select_options($selected, array $options, $compare_exactly = false)
+{
+    foreach ($options as $key => $value) {
+        if (!$compare_exactly) {
+            iwitness_view_helper_select_option_render((string)$selected, $key, $value);
+        } else {
+            iwitness_view_helper_select_option_render((string)$selected, $key, $value);
+        }
+    }
+}
+
+function iwitness_view_helper_select_option_render($selected, $key, $value)
+{
+    if ($selected === '' || $selected === null) {
+        if($key === iWitness::DEFAULT_TIMEZONE) {
+            echo '<option selected="selected" value="' . sanitize_text_field($key) . '">' . sanitize_text_field($value) . '</option>';
+        } else {
+            echo '<option  value="' . sanitize_text_field($key) . '">' . sanitize_text_field($value) . '</option>';
+        }
+    } else {
+        if ($key == $selected) {
+            echo '<option selected="selected" value="' . sanitize_text_field($key) . '">' . sanitize_text_field($value) . '</option>';
+        } else {
+            echo '<option  value="' . sanitize_text_field($key) . '">' . sanitize_text_field($value) . '</option>';
+        }
+    }
+}
+
+/**
+ * @param $value
+ * @return bool|string
+ */
+function iwitness_view_helper_format_date($value)
+{
+    try {
+        $result = $value ? date("m/d/Y", $value) : '';
+    } catch (Exception $ex) {
+        iwitness_log_error($ex->getMessage());
+        $result = '';
+    }
+    return $result;
+}
+
+
+/**
+ * @return array
+ */
+function iwitness_get_time_zone_options()
+{
+    $timezoneIdentifiers = DateTimeZone::listIdentifiers();
+    $utcTime = new DateTime('now', new DateTimeZone('UTC'));
+
+    $tempTimezones = array();
+    foreach ($timezoneIdentifiers as $timezoneIdentifier) {
+        $currentTimezone = new DateTimeZone($timezoneIdentifier);
+
+        $tempTimezones[] = array(
+            'offset' => (int)$currentTimezone->getOffset($utcTime),
+            'identifier' => $timezoneIdentifier
+        );
+    }
+
+    // Sort the array by offset,identifier ascending
+    usort($tempTimezones, function ($a, $b) {
+        return ($a['offset'] == $b['offset'])
+            ? strcmp($a['identifier'], $b['identifier'])
+            : $a['offset'] - $b['offset'];
+    });
+
+    $timezoneList = array();
+    foreach ($tempTimezones as $tz) {
+        $sign = ($tz['offset'] > 0) ? '+' : '-';
+        $offset = gmdate('H:i', abs($tz['offset']));
+        $timezoneList[$tz['identifier']] = '(UTC ' . $sign . $offset . ') ' .
+            $tz['identifier'];
+    }
+
+    return $timezoneList;
+}
+
+
+/**
+ * @param array $data
+ * @param bool $linkEmail
+ * @return string
+ */
+function iwitness_display_name(array $data, $linkEmail = true)
+{
+    if (!empty($data['firstName']) || !empty($data['lastName'])) {
+        $name = trim($data['firstName'] . ' ' . $data['lastName']);
+    } else if ($data['email']) {
+        $name = $data['email'];
+    } else if ($data['phone']) {
+        $name = '+' . $data['phone'];
+    } else {
+        $name = 'Unnamed';
+    }
+
+    if ($linkEmail && $data['email']) {
+        $email = $data['email'];
+        $name = "<a href='mailto:{$email}'>$name</a>";
+    }
+    return $name;
+}
+
+
+
+
+
+
+
+

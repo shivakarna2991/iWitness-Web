@@ -1,0 +1,31 @@
+;
+(function ($) {
+    "use strict";
+
+    $().ready(function () {
+        var $userTable = $('#user-table');
+
+        $userTable.find('tbody button').on('click', function (e) {
+            e.preventDefault();
+
+            var confirmMessage = "Are you sure to %action% this user?",
+                action = '';
+
+            if ($(this).val() == 'suspend') {
+                action = 'iwitness_do_admin_suspend_user';
+            } else if ($(this).val() == 'delete') {
+                action = 'iwitness_do_admin_delete_user';
+            }
+
+            confirmMessage = confirmMessage.replace('%action%', $(this).val());
+            if (confirm(confirmMessage)) {
+                var $form = $(this).closest('form'),
+                    $action = $('#action', $form);
+
+                $action.val(action);
+                $form.submit();
+            }
+        });
+    });
+
+})(jQuery);

@@ -1,0 +1,55 @@
+<?php do_action('iwitness_print_notices', false); ?>
+<?php
+        $redirect_to = isset($_REQUEST['redirect_to']) ? $_REQUEST['redirect_to'] : '';
+?>
+
+<?php
+
+    // get the log key from session and fill it to log field
+    $log = '';
+    $session = iWitness()->session();
+    if (isset($session['iwitness_log_key'])) {
+        $log = $session['iwitness_log_key'];
+    }
+?>
+
+<h2>Log In</h2>
+<p class="lead">Log in to your iWitness account</p>
+<hr>
+
+<div class="row">
+    <div class="col-md-3 col-sm-5">
+        <form data-validate="true" method="post" action="<?php echo esc_url(site_url('wp-login.php', 'login_post')); ?>"
+              enctype="application/x-www-form-urlencoded" id="login-form" novalidate="novalidate" role="form">
+            <fieldset>
+
+                <div class="form-group">
+                    <label for="phone" class="control-label">Wireless Number:</label>
+                    <input type="text" placeholder="e.g. 234-567-8900" value="<?php echo esc_attr(wp_unslash($log)); ?>"
+                           class="form-control" id="phone" name="log" data-rule-required="true">
+                </div>
+
+                <div class="form-group">
+                    <label for="password" class="control-label">Password:</label>
+                    <input type="password" class="form-control" value="" id="password" name="pwd" data-rule-required="true">
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="sign_in" name="login">Log In</button>
+                <input type="hidden" name="redirect_to" value="<?php echo $redirect_to; ?>" />
+            </fieldset>
+        </form>
+
+    </div>
+</div>
+<br>
+<br>
+<p>
+    <a href="<?php echo iwitness_get_page_path(IWITNESS_PAGE_FORGOT_PASSWORD_ID); ?>">I've forgotten my password</a><br>
+    <a onclick="jQuery('.hint').hide(); jQuery('.number-changed').toggle('fade'); return false;" href="#">My wireless number has
+        changed</a><br>
+    <a href="<?php echo iwitness_get_page_path(IWITNESS_PAGE_PURCHASE_ID); ?>">You can easily create a new account right here</a>
+</p>
+
+<span style="display:none" class="hint number-changed">
+    Log in with your old wireless number and then change it in the profile settings page
+</span>

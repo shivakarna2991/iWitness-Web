@@ -1,0 +1,14 @@
+<?php
+global $post; ?>
+
+<?php
+if ($post) {
+    $post_name = $post->post_name;
+    switch ($post_name) {
+        case 'content-landing-page':
+        default:
+            get_template_part('content-landing-page');
+            break;
+    }
+}
+?>
